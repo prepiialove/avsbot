@@ -8,7 +8,7 @@ const app = express();
 const PORT = process.env.PORT || 3001;
 const TELEGRAM_TOKEN = process.env.TELEGRAM_TOKEN || '8627552286:AAGj5-xvzvzC5pAXw7CmKEali6WDUlJ5OWg';
 const GEMINI_API_KEY = process.env.GEMINI_API_KEY || 'AIzaSyDQdkIn4Kz39Mrq3epbbCXcyRWRKan1Tdc';
-const BASE_URL = process.env.BASE_URL || `http://127.0.0.1:${PORT}`;
+const BASE_URL = 'https://avsbot.onrender.com';
 
 // ============================
 //  PROCESS SAFETY
@@ -126,7 +126,7 @@ const SCRIPTS = {
     '📝 Анкетування': `📝 *Будь ласка, заповніть форму для першого етапу:*\n\nhttps://forms.gle/v123456789 (приклад)\nПісля заповнення наш рекрутер @Recruiter_2000 зв'яжеться з вами.`,
     '🙋 Задати питання': `🙋 *Напишіть ваше питання прямо тут!*\n\nЯ або наш менеджер відповімо вам найближчим часом. Також ви можете активувати AI-помічника в меню адміна.`,
     '📞 Замовити дзвінок': `📞 *Замовити дзвінок*\n\nНапишіть ваш номер телефону в чат, і наш менеджер зв'яжеться з вами протягом робочого дня.`,
-    '🌐 Наш сайт': `🌐 *Наш офіційний сайт:*\n\n${BASE_URL}/`
+    '🌐 Наш сайт': `🌐 *Наш офіційний сайт:*\n\nhttps://avsbot.onrender.com/`
 };
 
 // ============================
@@ -227,7 +227,7 @@ bot.onText(/\/start/, async (msg) => {
             reply_markup: {
                 inline_keyboard: [
                     [{ text: '🖥 Відкрити Адмін-Панель', url: adminUrl }],
-                    [{ text: '🌐 Відвідати сайт AVS', url: `${BASE_URL}/` }]
+                    [{ text: '🌐 Відвідати сайт AVS', url: 'https://avstudy.com.ua/' }]
                 ]
             }
         });
@@ -235,7 +235,7 @@ bot.onText(/\/start/, async (msg) => {
     const sid = String(msg.chat.id);
     const isFirstTime = !sessions.has(sid);
     const s = getOrCreateSession(sid, msg);
-    await safeSend(msg.chat.id, `Вітаємо в AVS EdTech! 🚀\n\nЯ — ваш Інтелектуальний Помічник. Оберіть пункт меню або просто напишіть ваше запитання.\n\n🌐 Наш сайт: ${BASE_URL}/`, { reply_markup: USER_KEYBOARD });
+    await safeSend(msg.chat.id, `Вітаємо в AVS EdTech! 🚀\n\nЯ — ваш Інтелектуальний Помічник. Оберіть пункт меню або просто напишіть ваше запитання.\n\n🌐 Наш сайт: https://avsbot.onrender.com/`, { reply_markup: USER_KEYBOARD });
     if (isFirstTime) await notifyAdmin(s, sid, true);
 });
 
@@ -247,7 +247,7 @@ bot.on('message', async (msg) => {
     const isAdmin = cid === String(adminChatId);
 
     if (isAdmin) {
-        if (msg.text === '🖥 Адмін-панель') return safeSend(adminChatId, `🚀 [ВІДКРИТИ АДМІН-ПАНЕЛЬ](${BASE_URL}/admin.html)`);
+        if (msg.text === '🖥 Адмін-панель') return safeSend(adminChatId, `🚀 [ВІДКРИТИ АДМІН-ПАНЕЛЬ](${BASE_URL}/admin.html?token=auth_required)`);
         if (msg.text === '👥 Активні чати') {
             const btns = [];
             sessions.forEach((s, sid) => btns.push([{ text: `${s.tgChatId ? '📟' : '🌐'} ${s.name}`, callback_data: `reply_${sid}` }]));

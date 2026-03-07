@@ -2,7 +2,7 @@
  * AVS Ultimate Chat Widget v4.25 - TELEGRAM BUTTON ADDED
  */
 (function () {
-  const SERVER = 'http://localhost:3001';
+  const SERVER = 'https://avsbot.onrender.com';
   const SID_KEY = 'avs_final_sid';
   const SOUND_URL = 'https://assets.mixkit.co/active_storage/sfx/2354/2354-preview.mp3';
   const TG_LINK = 'https://t.me/avswebbot'; // Correct Telegram bot
