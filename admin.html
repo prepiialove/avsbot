@@ -1,0 +1,421 @@
+<!DOCTYPE html>
+<html lang="uk">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AVS Admin Dashboard v4.37</title>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;600;700&display=swap"
+        rel="stylesheet">
+    <style>
+        :root {
+            --primary: #6366f1;
+            --primary-light: #818cf8;
+            --bg: #0f172a;
+            --card-bg: rgba(30, 41, 59, 0.7);
+            --text: #f8fafc;
+            --text-dim: #94a3b8;
+            --accent: #10b981;
+            --border: rgba(255, 255, 255, 0.1);
+        }
+
+        body {
+            margin: 0;
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            display: flex;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        /* Sidebar */
+        .sidebar {
+            width: 320px;
+            background: rgba(15, 23, 42, 0.9);
+            border-right: 1px solid var(--border);
+            display: flex;
+            flex-direction: column;
+            backdrop-filter: blur(20px);
+        }
+
+        .sidebar-header {
+            padding: 24px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .sidebar-header h1 {
+            font-size: 1.25rem;
+            margin: 0;
+            background: linear-gradient(135deg, white, var(--primary-light));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .chat-list {
+            flex: 1;
+            overflow-y: auto;
+            padding: 12px;
+        }
+
+        .chat-item {
+            padding: 16px;
+            border-radius: 12px;
+            margin-bottom: 8px;
+            cursor: pointer;
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+            border: 1px solid transparent;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .chat-item:hover {
+            background: rgba(255, 255, 255, 0.05);
+        }
+
+        .chat-item.active {
+            background: var(--card-bg);
+            border-color: var(--primary);
+            box-shadow: 0 4px 20px rgba(99, 102, 241, 0.2);
+        }
+
+        .platform-icon {
+            font-size: 1.25rem;
+        }
+
+        .chat-info h3 {
+            margin: 0;
+            font-size: 0.95rem;
+            font-weight: 600;
+        }
+
+        .chat-info p {
+            margin: 4px 0 0;
+            font-size: 0.8rem;
+            color: var(--text-dim);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        /* Main Content */
+        .main-content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            background: radial-gradient(circle at top right, rgba(99, 102, 241, 0.1), transparent 40%);
+        }
+
+        .chat-header {
+            padding: 24px;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: rgba(15, 23, 42, 0.5);
+        }
+
+        .active-user-name {
+            font-size: 1.25rem;
+            font-weight: 700;
+        }
+
+        .history-container {
+            flex: 1;
+            overflow-y: auto;
+            padding: 24px;
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .msg-row {
+            display: flex;
+            flex-direction: column;
+            max-width: 80%;
+        }
+
+        .msg-row.user {
+            align-self: flex-start;
+        }
+
+        .msg-row.admin {
+            align-self: flex-end;
+        }
+
+        .msg-row.ai {
+            align-self: center;
+            max-width: 60%;
+        }
+
+        .msg-bubble {
+            padding: 12px 18px;
+            border-radius: 18px;
+            font-size: 0.95rem;
+            line-height: 1.5;
+        }
+
+        .user .msg-bubble {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid var(--border);
+            border-bottom-left-radius: 4px;
+        }
+
+        .admin .msg-bubble {
+            background: var(--primary);
+            color: white;
+            border-bottom-right-radius: 4px;
+            box-shadow: 0 4px 12px rgba(99, 102, 241, 0.2);
+        }
+
+        .ai .msg-bubble {
+            background: rgba(245, 158, 11, 0.1);
+            border: 1px solid rgba(245, 158, 11, 0.3);
+            font-style: italic;
+        }
+
+        /* Input Area */
+        .input-area {
+            padding: 24px;
+            background: rgba(15, 23, 42, 0.8);
+            border-top: 1px solid var(--border);
+            display: flex;
+            gap: 12px;
+            backdrop-filter: blur(10px);
+        }
+
+        input {
+            flex: 1;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 14px 20px;
+            color: white;
+            outline: none;
+            transition: border-color 0.2s;
+            font-size: 0.95rem;
+        }
+
+        input:focus {
+            border-color: var(--primary);
+        }
+
+        button.send-btn {
+            background: var(--primary);
+            color: white;
+            border: none;
+            border-radius: 12px;
+            padding: 0 24px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        button.send-btn:hover {
+            background: var(--primary-light);
+        }
+
+        button.send-btn:active {
+            transform: scale(0.95);
+        }
+
+        button.send-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .empty-state {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            color: var(--text-dim);
+            gap: 16px;
+        }
+
+        ::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="sidebar">
+        <div class="sidebar-header">
+            <h1>AVS Dashboard</h1>
+            <p id="total-chats" style="font-size: 0.75rem; color: var(--text-dim); margin-top: 4px;"></p>
+        </div>
+        <div id="chat-list" class="chat-list"></div>
+    </div>
+
+    <main class="main-content">
+        <div id="chat-header" class="chat-header" style="display: none;">
+            <div>
+                <div id="active-user-name" class="active-user-name"></div>
+                <div id="active-user-phone" style="color: var(--text-dim); font-size: 0.8rem;"></div>
+            </div>
+        </div>
+        <div style="display: flex; align-items: center; gap: 15px;">
+            <div id="active-platform"
+                style="font-size: 0.8rem; background: rgba(255,255,255,0.05); padding: 4px 12px; border-radius: 20px;">
+            </div>
+            <button onclick="deleteSession()"
+                style="background: rgba(239, 68, 68, 0.1); color: #ef4444; border: 1px solid rgba(239, 68, 68, 0.2); padding: 8px 12px; border-radius: 8px; cursor: pointer; display: flex; align-items: center; gap: 6px; transition: all 0.2s;"
+                onmouseover="this.style.background='rgba(239, 68, 68, 0.2)'"
+                onmouseout="this.style.background='rgba(239, 68, 68, 0.1)'" title="Видалити цей чат">
+                <span>🗑️</span>
+            </button>
+        </div>
+        </div>
+
+        <div id="history-container" class="history-container">
+            <div class="empty-state">
+                <p>Оберіть чат із списку зліва</p>
+            </div>
+        </div>
+
+        <div id="input-area" class="input-area" style="display: none;">
+            <input type="text" id="msg-input" placeholder="Напишіть повідомлення..."
+                onkeypress="if(event.key==='Enter') sendReply()">
+            <button class="send-btn" id="send-btn" onclick="sendReply()">Надіслати</button>
+        </div>
+    </main>
+
+    <script>
+        let currentSid = null;
+        let allSessions = {};
+
+        async function update() {
+            try {
+                const res = await fetch('/api/admin/sessions');
+                allSessions = await res.json();
+                renderList();
+                if (currentSid) renderChat();
+            } catch (e) {
+                console.error("Dashboard fetch error:", e);
+            }
+        }
+
+        function renderList() {
+            const list = document.getElementById('chat-list');
+            const entries = Object.entries(allSessions).sort((a, b) => b[1].created - a[1].created);
+            document.getElementById('total-chats').textContent = `Лідів: ${entries.length}`;
+
+            list.innerHTML = entries.map(([sid, s]) => `
+                <div class="chat-item ${currentSid === sid ? 'active' : ''}" onclick="select('${sid}')">
+                    <span style="font-size: 1.2rem;">${s.tgChatId ? '📟' : '🌐'}</span>
+                    <div class="chat-info">
+                        <h3>${s.name}</h3>
+                        <p>${s.messages.length ? s.messages[s.messages.length - 1].text : 'Новий лід'}</p>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function select(sid) {
+            currentSid = sid;
+            document.getElementById('chat-header').style.display = 'flex';
+            document.getElementById('input-area').style.display = 'flex';
+            const s = allSessions[sid];
+            document.getElementById('active-user-name').textContent = s.name;
+            document.getElementById('active-user-phone').textContent = s.phone;
+            document.getElementById('active-platform').textContent = s.tgChatId ? '📟 Telegram' : '🌐 Website';
+            renderChat();
+            renderList();
+            setTimeout(() => document.getElementById('msg-input').focus(), 100);
+        }
+
+        function renderChat() {
+            const container = document.getElementById('history-container');
+            if (!allSessions[currentSid]) return;
+            const messages = allSessions[currentSid].messages;
+
+            const html = messages.map(m => {
+                const type = m.from === 'user' ? 'user' : (m.isAI ? 'ai' : 'admin');
+                return `
+                    <div class="msg-row ${type}">
+                        <div class="msg-bubble">${m.text.replace(/\n/g, '<br>')}</div>
+                    </div>
+                `;
+            }).join('');
+
+            if (container.innerHTML !== html) {
+                container.innerHTML = html;
+                container.scrollTop = container.scrollHeight;
+            }
+        }
+
+        async function sendReply() {
+            const input = document.getElementById('msg-input');
+            const btn = document.getElementById('send-btn');
+            const text = input.value.trim();
+            if (!text || !currentSid) return;
+
+            btn.disabled = true;
+            try {
+                const response = await fetch('/api/admin/reply', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ sessionId: currentSid, message: text })
+                });
+
+                if (response.ok) {
+                    input.value = '';
+                    update();
+                } else {
+                    alert("Помилка відправки. Перевірте з'єднання.");
+                }
+            } catch (err) {
+                alert("Помилка мережі: " + err.message);
+            } finally {
+                btn.disabled = false;
+                input.focus();
+            }
+        }
+
+        async function deleteSession() {
+            if (!currentSid) return;
+            const s = allSessions[currentSid];
+            if (!confirm(`Ви впевнені, що хочете видалити чат з "${s.name}"? Це неможливо відмінити.`)) return;
+
+            try {
+                const res = await fetch(`/api/admin/sessions/${currentSid}`, { method: 'DELETE' });
+                if (res.ok) {
+                    currentSid = null;
+                    document.getElementById('chat-header').style.display = 'none';
+                    document.getElementById('input-area').style.display = 'none';
+                    document.getElementById('history-container').innerHTML = `
+                        <div class="empty-state">
+                            <p>Чат видалено успішно</p>
+                        </div>`;
+                    update();
+                } else {
+                    alert("Помилка при видаленні.");
+                }
+            } catch (e) {
+                alert("Помилка мережі: " + e.message);
+            }
+        }
+
+        setInterval(update, 2000);
+
+        // Support direct session link
+        window.onload = async () => {
+            await update();
+            const params = new URLSearchParams(window.location.search);
+            const sid = params.get('session') || params.get('id');
+            if (sid && allSessions[sid]) {
+                select(sid);
+            }
+        };
+    </script>
+</body>
+
+</html>
