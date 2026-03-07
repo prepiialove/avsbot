@@ -1,3 +1,4 @@
+require('dotenv').config();
 const express = require('express');
 const cors = require('cors');
 const TelegramBot = require('node-telegram-bot-api');
@@ -6,8 +7,8 @@ const path = require('path');
 
 const app = express();
 const PORT = process.env.PORT || 3001;
-const TELEGRAM_TOKEN = process.env.TELEGRAM_TOKEN || '8627552286:AAGj5-xvzvzC5pAXw7CmKEali6WDUlJ5OWg';
-const GEMINI_API_KEY = process.env.GEMINI_API_KEY || 'AIzaSyDQdkIn4Kz39Mrq3epbbCXcyRWRKan1Tdc';
+const TELEGRAM_TOKEN = process.env.TELEGRAM_TOKEN;
+const GEMINI_API_KEY = process.env.GEMINI_API_KEY;
 const BASE_URL = 'https://avsbot.onrender.com';
 
 // ============================
@@ -149,33 +150,38 @@ function getOrCreateSession(sid, msg = null) {
 // ============================
 //  AI
 // ============================
-async function getAIResponse(userMessage) {
-    if (!aiEnabled) return null;
-    const instruction = `Ти - Експерт-консультант компанії AVS EdTech. Твій тон професійний, дружній і максимально ЛЮДСЬКИЙ.
-ПРАВИЛА ВІДПОВІДІ:
-1. ПИШИ ТІЛЬКИ ТЕКСТОМ. ЗАБОРОНЕНО використовувати символи форматування Markdown: жодних **, ###, _, *, #.
-2. БУДЬ ЛАКОНІЧНИМ. Відповідай коротко (1-3 абзаци), як звичайна людина в чаті.
-3. ЗАВЖДИ ЗАКИНЧУЙ ДУМКУ. Речення має бути повним і закінченим. Не обривай на півслові.
-4. КОНТЕКСТ: AVS EdTech (7+ років, навчання бухгалтерів, UA/KZ/PL/BR). Вакансія PM у Польщі ($1500-$3000). Рекрутинг: Форма->Рекрутер->Soft Skills->Hard Skills->Offer. Артем - COO.
-Відповідай одразу, без довгих вступів, зрозумілою мовою.`;
+async function getAIResponse(userMessage, customKey = null, customModel = null) {
+    // If not enabled and no custom key provided, return null
+    if (!aiEnabled && !customKey) return null;
 
-    const MODELS = ['gemini-2.0-flash', 'gemini-1.5-flash', 'gemini-1.5-flash-latest'];
+    const apiKey = customKey || GEMINI_API_KEY;
+    const instruction = `Ти - Експерт-консультант компанії AVS EdTech та AI помічник-шпаргалка для кандидата на вакансію PM. 
+Відповідай коротко (1-3 речення), професійно, впевнено. 
+Використовуй термінологію компанії: воронки, вебінари, ліди, win-win комунікація, утримання дедлайнів, конверсія.
+Допомагай кандидату виглядати експертом. Відповідай українською мовою. ПИШИ ТІЛЬКИ ТЕКСТОМ без Markdown.`;
+
+    const MODELS = customModel ? [customModel] : ['gemini-2.0-flash', 'gemini-1.5-flash', 'gemini-1.5-flash-latest'];
+
     for (const modelId of MODELS) {
         try {
-            const url = `https://generativelanguage.googleapis.com/v1beta/models/${modelId}:generateContent?key=${GEMINI_API_KEY}`;
+            const url = `https://generativelanguage.googleapis.com/v1beta/models/${modelId}:generateContent?key=${apiKey}`;
             const response = await fetch(url, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ contents: [{ parts: [{ text: `${instruction}\n\nКлієнт запитує: ${userMessage}` }] }] })
+                body: JSON.stringify({
+                    systemInstruction: { parts: [{ text: instruction }] },
+                    contents: [{ parts: [{ text: userMessage }] }],
+                    generationConfig: { temperature: 0.7 }
+                })
             });
             const data = await response.json();
-            if (data.error) continue;
-            let text = data.candidates?.[0]?.content?.parts?.[0]?.text;
-            if (text) {
-                // Final cleanup of markdown symbols just in case
-                return text.replace(/[*_#`]/g, '').trim();
+            if (data.error) {
+                console.error(`[AI] Error ${modelId}:`, data.error.message);
+                continue;
             }
-        } catch (e) { console.error(`[AI] Error ${modelId}:`, e.message); }
+            let text = data.candidates?.[0]?.content?.parts?.[0]?.text;
+            if (text) return text.replace(/[*_#`]/g, '').trim();
+        } catch (e) { console.error(`[AI] Exception ${modelId}:`, e.message); }
     }
     return null;
 }
@@ -378,19 +384,27 @@ app.post('/api/send', async (req, res) => {
 });
 
 app.post('/api/ai_chat', async (req, res) => {
-    const { sessionId, message } = req.body;
-    const s = getOrCreateSession(sessionId);
-    s.messages.push({ from: 'user', text: message, ts: Date.now() });
-    await notifyAdmin(s, sessionId);
+    const { sessionId, message, customKey, model } = req.body;
 
-    if (!aiEnabled) {
-        return res.json({ reply: "Менеджер скоро відповість вам." });
+    // For the public "cheat sheet" assistant, we don't necessarily need sessions,
+    // but we'll try to use it if provided.
+    const s = sessionId !== 'cheat_sheet_user' ? getOrCreateSession(sessionId) : null;
+    if (s) {
+        s.messages.push({ from: 'user', text: message, ts: Date.now() });
+        await notifyAdmin(s, sessionId);
     }
 
-    let replyTxt = await getAIResponse(message) || "Зачекайте на відповідь менеджера.";
-    s.messages.push({ from: 'admin', text: replyTxt, ts: Date.now(), isAI: true, delivered: true });
-    saveSessions();
-    await notifyAdmin(s, sessionId, false, replyTxt);
+    let replyTxt = await getAIResponse(message, customKey, model);
+
+    if (!replyTxt) {
+        return res.json({ reply: "Зачекайте на відповідь менеджера або перевірте налаштування AI." });
+    }
+
+    if (s) {
+        s.messages.push({ from: 'admin', text: replyTxt, ts: Date.now(), isAI: true, delivered: true });
+        saveSessions();
+        await notifyAdmin(s, sessionId, false, replyTxt);
+    }
     res.json({ reply: replyTxt });
 });
 

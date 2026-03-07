@@ -62,18 +62,24 @@ const showKeyToggle = document.getElementById('show-key-toggle');
 
 const GEMINI_API_KEY_STORAGE = 'gemini_api_key';
 const GEMINI_MODEL_STORAGE = 'gemini_model';
-const DEFAULT_KEY = "AIzaSyDQdkIn4Kz39Mrq3epbbCXcyRWRKan1Tdc";
 const DEFAULT_MODEL = "gemini-2.5-flash";
+const SITE_PIN = "0205";
 
 // --- Settings Modal Logic ---
 function openSettingsModal() {
     if (!settingsModal) return;
-    const currentKey = localStorage.getItem(GEMINI_API_KEY_STORAGE) || DEFAULT_KEY;
+
+    const pin = prompt("Введіть пін-код для доступу до налаштувань:");
+    if (pin !== SITE_PIN) {
+        alert("❌ Невірний пін-код!");
+        return;
+    }
+
+    const currentKey = localStorage.getItem(GEMINI_API_KEY_STORAGE) || "";
     const currentModel = localStorage.getItem(GEMINI_MODEL_STORAGE) || DEFAULT_MODEL;
     if (modalApiKey) modalApiKey.value = currentKey;
     if (modalModel) {
         modalModel.value = currentModel;
-        // If the stored model isn't in the list, default to first option
         if (!modalModel.value) modalModel.value = DEFAULT_MODEL;
     }
     if (modalStatus) modalStatus.textContent = '';
@@ -123,9 +129,9 @@ if (modalResetBtn) {
     modalResetBtn.addEventListener('click', () => {
         localStorage.removeItem(GEMINI_API_KEY_STORAGE);
         localStorage.removeItem(GEMINI_MODEL_STORAGE);
-        if (modalApiKey) modalApiKey.value = DEFAULT_KEY;
+        if (modalApiKey) modalApiKey.value = "";
         if (modalModel) modalModel.value = DEFAULT_MODEL;
-        if (modalStatus) modalStatus.textContent = '🔄 Скинуто до стандартних налаштувань.';
+        if (modalStatus) modalStatus.textContent = '🔄 Скинуто до налаштувань за замовчуванням.';
     });
 }
 
@@ -141,45 +147,33 @@ if (aiChatBox && aiInput && aiSendBtn) {
     }
 
     async function fetchAIResponse(userMessage) {
-        const apiKey = localStorage.getItem(GEMINI_API_KEY_STORAGE) || DEFAULT_KEY;
+        const customKey = localStorage.getItem(GEMINI_API_KEY_STORAGE);
         const model = localStorage.getItem(GEMINI_MODEL_STORAGE) || DEFAULT_MODEL;
 
-        const systemInstruction = `Ти - AI помічник-шпаргалка, який допомагає кандидату на співбесіді на посаду Project Manager в EdTech компанію AVS (масштабування у Польщі). 
-Відповідай коротко (1-3 речення), професійно, впевнено. 
-Використовуй термінологію, яку використовує компанія: воронки, вебінари, ліди, win-win комунікація, утримання дедлайнів, конверсія.
-Допомагай кандидату виглядати експертом з глибоким розумінням процесів.
-Твоє завдання: швидко дати ідеальну відповідь на питання рекрутера. Відповідай українською мовою.`;
-
         try {
-            const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`;
-            const response = await fetch(url, {
+            // If user has a custom key, they might still want to use it directly, 
+            // but for security and using the "hidden" key, we should route through our server.
+            // We'll modify the backend to accept a model parameter.
+
+            const response = await fetch('/api/ai_chat', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
-                    systemInstruction: { parts: [{ text: systemInstruction }] },
-                    contents: [{ parts: [{ text: userMessage }] }],
-                    generationConfig: { temperature: 0.7 }
+                    message: userMessage,
+                    sessionId: 'cheat_sheet_user', // Dummy session ID for the widget
+                    customKey: customKey || null,
+                    model: model
                 })
             });
 
             const data = await response.json();
 
-            if (data.error) {
-                if (data.error.code === 400 && data.error.message.includes("API key not valid")) {
-                    localStorage.removeItem(GEMINI_API_KEY_STORAGE);
-                    addMessage("Помилка: Невірний API ключ. Натисніть на шестірню ⚙️ та введіть правильний ключ.", "system");
-                } else {
-                    addMessage("Помилка AI: " + data.error.message + " | Натисніть ⚙️ та перевірте налаштування.", "system");
-                }
-                document.querySelector('.ai-message.system.loading')?.remove();
-                return;
-            }
-
             document.querySelector('.ai-message.system.loading')?.remove();
 
-            if (data.candidates && data.candidates[0] && data.candidates[0].content) {
-                const replyText = data.candidates[0].content.parts[0].text;
-                addMessage(replyText, "bot");
+            if (data.reply) {
+                addMessage(data.reply, "bot");
+            } else if (data.error) {
+                addMessage("Помилка: " + data.error, "system");
             } else {
                 addMessage("Відбулася невідома помилка при обробці.", "system");
             }
