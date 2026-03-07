@@ -227,7 +227,7 @@ bot.onText(/\/start/, async (msg) => {
             reply_markup: {
                 inline_keyboard: [
                     [{ text: '🖥 Відкрити Адмін-Панель', url: adminUrl }],
-                    [{ text: '🌐 Відвідати сайт AVS', url: 'https://avstudy.com.ua/' }]
+                    [{ text: '🌐 Відвідати сайт AVS', url: 'https://avsbot.onrender.com/index.html' }]
                 ]
             }
         });
