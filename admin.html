@@ -446,6 +446,22 @@
                 <p style="font-size: 0.8rem; color: var(--text-dim); margin-top: 4px;">Повідомлень на сесію</p>
             </div>
 
+            <div class="stat-card"
+                style="grid-column: span 2; display: flex; justify-content: space-between; align-items: center;">
+                <div>
+                    <div class="stat-title">🛠️ Адміністрування</div>
+                    <button onclick="exportToCSV()" class="send-btn"
+                        style="background: var(--accent); white-space: nowrap; font-size: 0.8rem; height: 40px; padding: 0 20px;">
+                        📥 ЗАВАНТАЖИТИ БАЗУ (CSV)
+                    </button>
+                </div>
+                <div style="text-align: right;">
+                    <div class="stat-title" style="justify-content: flex-end;">🕒 Останнє оновлення</div>
+                    <div id="last-update-time" style="font-size: 0.9rem; font-weight: 600; color: var(--text-dim);">...
+                    </div>
+                </div>
+            </div>
+
             <div class="stat-card" style="grid-column: span 2;">
                 <div class="stat-title">⏰ Пікова активність (Години)</div>
                 <div
@@ -500,6 +516,9 @@
                 <div id="active-platform"
                     style="font-size: 0.75rem; background: rgba(255,255,255,0.05); padding: 6px 14px; border-radius: 20px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px;">
                 </div>
+                <button onclick="sendCalendar()"
+                    style="background: rgba(139, 92, 246, 0.1); border: 1px solid rgba(139, 92, 246, 0.2); color: #c084fc; padding: 8px 14px; border-radius: 10px; cursor: pointer; font-size: 0.8rem; font-weight: 600; display: flex; align-items: center; gap: 6px; transition: all 0.2s;">📅
+                    Забронювати</button>
                 <button onclick="showDashboard()"
                     style="background: rgba(255,255,255,0.05); border: 1px solid var(--border); color: #fff; padding: 8px 14px; border-radius: 10px; cursor: pointer; font-size: 0.8rem; transition: all 0.2s;">🏠
                     Дашборд</button>
@@ -513,6 +532,22 @@
         </div>
 
         <div id="history-container" class="history-container" style="display: none;"></div>
+
+        <div id="template-area"
+            style="display: none; padding: 12px 32px; background: rgba(15, 23, 42, 0.4); border-top: 1px solid var(--border); display: flex; gap: 10px; flex-wrap: wrap;">
+            <button onclick="useTemplate('Призначити співбесіду')"
+                style="background: rgba(16, 185, 129, 0.1); border: 1px solid rgba(16, 185, 129, 0.2); color: #10b981; padding: 6px 14px; border-radius: 20px; cursor: pointer; font-size: 0.75rem; font-weight: 600; transition: 0.2s;">✅
+                Співбесіда</button>
+            <button onclick="useTemplate('Відмова')"
+                style="background: rgba(239, 68, 68, 0.1); border: 1px solid rgba(239, 68, 68, 0.2); color: #ef4444; padding: 6px 14px; border-radius: 20px; cursor: pointer; font-size: 0.75rem; font-weight: 600; transition: 0.2s;">❌
+                Відмова</button>
+            <button onclick="useTemplate('Очікуйте фідбеку')"
+                style="background: rgba(245, 158, 11, 0.1); border: 1px solid rgba(245, 158, 11, 0.2); color: #f59e0b; padding: 6px 14px; border-radius: 20px; cursor: pointer; font-size: 0.75rem; font-weight: 600; transition: 0.2s;">⏳
+                Фідбек</button>
+            <button onclick="useTemplate('Дякуємо за відгук!')"
+                style="background: rgba(59, 130, 246, 0.1); border: 1px solid rgba(59, 130, 246, 0.2); color: #3b82f6; padding: 6px 14px; border-radius: 20px; cursor: pointer; font-size: 0.75rem; font-weight: 600; transition: 0.2s;">👋
+                Дякуємо</button>
+        </div>
 
         <div id="input-area" class="input-area" style="display: none;">
             <input type="text" id="msg-input" placeholder="Введіть відповідь кандидату..."
@@ -531,6 +566,7 @@
                 allSessions = await res.json();
                 renderList();
                 updateStats();
+                document.getElementById('last-update-time').textContent = new Date().toLocaleTimeString();
                 if (currentSid) renderChat();
             } catch (e) {
                 console.error("Dashboard fetch error:", e);
@@ -576,8 +612,50 @@
             document.getElementById('dashboard-view').style.display = 'grid';
             document.getElementById('chat-header').style.display = 'none';
             document.getElementById('history-container').style.display = 'none';
+            document.getElementById('template-area').style.display = 'none';
             document.getElementById('input-area').style.display = 'none';
             renderList();
+        }
+
+        const templates = {
+            'Призначити співбесіду': 'Вітаємо! Ми ознайомилися з вашим запитом та хочемо призначити співбесіду. Оберіть зручний час у нашому календарі або напишіть ваші пропозиції.',
+            'Відмова': 'Дякуємо за ваш інтерес до нашого проекту. На жаль, на даному етапі ми обрали іншого кандидата. Бажаємо успіхів у пошуках!',
+            'Очікуйте фідбеку': 'Дякуємо за відповіді! Ми опрацюємо вашу інформацію та повернемося з фідбеком протягом 2-3 робочих днів.',
+            'Дякуємо за відгук!': 'Дякуємо, що поділилися вашим досвідом! Ми цінуємо ваш інтерес до нашої команди.'
+        };
+
+        function useTemplate(key) {
+            const input = document.getElementById('msg-input');
+            input.value = templates[key] || '';
+            input.focus();
+        }
+
+        async function sendCalendar() {
+            const input = document.getElementById('msg-input');
+            input.value = "Будь ласка, оберіть зручний час для співбесіди за цим посиланням: https://calendly.com/avs-edtech/interview";
+            sendReply();
+        }
+
+        function exportToCSV() {
+            const sessionsArr = Object.values(allSessions);
+            if (sessionsArr.length === 0) return alert("Немає даних для експорту.");
+
+            let csv = "\uFEFF ID,Ім'я,Телефон,Платформа,Створено,Повідомлень\n";
+            sessionsArr.forEach(s => {
+                const date = new Date(s.created).toLocaleString();
+                const platform = s.tgChatId ? 'Telegram' : 'Website';
+                csv += `${s.sid},"${s.name}","${s.phone}",${platform},"${date}",${s.messages.length}\n`;
+            });
+
+            const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+            const link = document.createElement("a");
+            const url = URL.createObjectURL(blob);
+            link.setAttribute("href", url);
+            link.setAttribute("download", `avs_leads_${new Date().toISOString().split('T')[0]}.csv`);
+            link.style.visibility = 'hidden';
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
         }
 
         function renderList() {
@@ -617,6 +695,7 @@
             document.getElementById('active-user-name').textContent = s.name;
             document.getElementById('active-user-phone').textContent = s.phone;
             document.getElementById('active-platform').textContent = s.tgChatId ? '📟 Telegram' : '🌐 Website';
+            document.getElementById('template-area').style.display = 'flex';
             renderChat();
             renderList();
             setTimeout(() => document.getElementById('msg-input').focus(), 100);
