@@ -1,14 +1,16 @@
 :root {
     --bg-main: #0b0f19;
-    --bg-card: rgba(26, 31, 53, 0.6);
+    --bg-card: rgba(26, 31, 53, 0.4);
     --border-card: rgba(255, 255, 255, 0.08);
     --text-primary: #f8fafc;
     --text-secondary: #94a3b8;
     --accent-1: #3b82f6;
+    --accent-1-glow: rgba(59, 130, 246, 0.3);
     --accent-2: #8b5cf6;
+    --accent-2-glow: rgba(139, 92, 246, 0.3);
     --accent-gradient: linear-gradient(135deg, var(--accent-1), var(--accent-2));
     --card-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
-    --transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    --transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 * {
@@ -36,10 +38,19 @@ h4 {
 }
 
 .gradient-text {
-    background: var(--accent-gradient);
+    background: linear-gradient(135deg, #60a5fa, #a78bfa, #c084fc);
+    background-size: 200% auto;
     -webkit-background-clip: text;
+    background-clip: text;
     -webkit-text-fill-color: transparent;
     display: inline-block;
+    animation: shine 5s linear infinite;
+}
+
+@keyframes shine {
+    to {
+        background-position: 200% center;
+    }
 }
 
 .gradient-bg {
@@ -106,19 +117,19 @@ ul {
 /* Glassmorphism Classes */
 .glass {
     background: var(--bg-card);
-    backdrop-filter: blur(12px);
-    -webkit-backdrop-filter: blur(12px);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
     border: 1px solid var(--border-card);
-    border-radius: 20px;
+    border-radius: 24px;
     padding: 2.5rem;
     box-shadow: var(--card-shadow);
     transition: var(--transition);
 }
 
 .glass:hover {
-    transform: translateY(-5px);
-    border-color: rgba(255, 255, 255, 0.15);
-    box-shadow: 0 15px 40px -5px rgba(59, 130, 246, 0.15);
+    transform: translateY(-10px) scale(1.02);
+    border-color: rgba(99, 102, 241, 0.4);
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4), 0 0 20px var(--accent-1-glow);
 }
 
 /* Navbar */
@@ -144,19 +155,24 @@ ul {
 
 .btn-primary {
     display: inline-block;
-    background: var(--accent-gradient);
+    background: linear-gradient(135deg, var(--accent-1), var(--accent-2));
     color: white;
-    padding: 0.8rem 1.5rem;
+    padding: 1rem 2rem;
     border-radius: 50px;
-    font-weight: 600;
+    font-weight: 700;
     transition: var(--transition);
     border: none;
     cursor: pointer;
+    box-shadow: 0 4px 15px var(--accent-1-glow);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    font-size: 0.9rem;
 }
 
 .btn-primary:hover {
-    box-shadow: 0 0 20px rgba(139, 92, 246, 0.4);
-    transform: scale(1.05);
+    box-shadow: 0 8px 25px var(--accent-2-glow);
+    transform: translateY(-3px) scale(1.05);
+    filter: brightness(1.1);
 }
 
 .btn-secondary {
@@ -206,14 +222,32 @@ ul {
 
 .badge {
     display: inline-block;
-    padding: 0.4rem 1.2rem;
-    border-radius: 20px;
+    padding: 0.5rem 1.5rem;
+    border-radius: 30px;
     background: rgba(59, 130, 246, 0.1);
     color: var(--accent-1);
-    font-size: 0.9rem;
-    font-weight: 600;
-    margin-bottom: 1.5rem;
-    border: 1px solid rgba(59, 130, 246, 0.2);
+    font-size: 0.85rem;
+    font-weight: 700;
+    margin-bottom: 2rem;
+    border: 1px solid rgba(59, 130, 246, 0.3);
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    box-shadow: 0 0 15px var(--accent-1-glow);
+    animation: pulseGlow 2s infinite;
+}
+
+@keyframes pulseGlow {
+    0% {
+        box-shadow: 0 0 5px var(--accent-1-glow);
+    }
+
+    50% {
+        box-shadow: 0 0 20px var(--accent-1-glow);
+    }
+
+    100% {
+        box-shadow: 0 0 5px var(--accent-1-glow);
+    }
 }
 
 .main-title {

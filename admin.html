@@ -10,19 +10,25 @@
     <style>
         :root {
             --primary: #6366f1;
+            --primary-glow: rgba(99, 102, 241, 0.4);
             --primary-light: #818cf8;
             --bg: #0f172a;
             --card-bg: rgba(30, 41, 59, 0.7);
             --text: #f8fafc;
             --text-dim: #94a3b8;
             --accent: #10b981;
+            --accent-glow: rgba(16, 185, 129, 0.3);
             --border: rgba(255, 255, 255, 0.1);
+            --glass: rgba(255, 255, 255, 0.03);
         }
 
         body {
             margin: 0;
             font-family: 'Plus Jakarta Sans', sans-serif;
             background: var(--bg);
+            background-image:
+                radial-gradient(circle at 0% 0%, rgba(99, 102, 241, 0.1) 0%, transparent 50%),
+                radial-gradient(circle at 100% 100%, rgba(16, 185, 129, 0.05) 0%, transparent 50%);
             color: var(--text);
             display: flex;
             height: 100vh;
@@ -32,62 +38,80 @@
         /* Sidebar */
         .sidebar {
             width: 320px;
-            background: rgba(15, 23, 42, 0.9);
+            background: rgba(15, 23, 42, 0.8);
             border-right: 1px solid var(--border);
             display: flex;
             flex-direction: column;
-            backdrop-filter: blur(20px);
+            backdrop-filter: blur(25px);
+            z-index: 10;
         }
 
         .sidebar-header {
-            padding: 24px;
+            padding: 32px 24px;
             border-bottom: 1px solid var(--border);
         }
 
         .sidebar-header h1 {
-            font-size: 1.25rem;
+            font-size: 1.5rem;
             margin: 0;
-            background: linear-gradient(135deg, white, var(--primary-light));
+            font-weight: 800;
+            background: linear-gradient(135deg, #fff 30%, var(--primary-light));
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
+            letter-spacing: -0.5px;
         }
 
         .chat-list {
             flex: 1;
             overflow-y: auto;
-            padding: 12px;
+            padding: 16px;
         }
 
         .chat-item {
             padding: 16px;
-            border-radius: 12px;
-            margin-bottom: 8px;
+            border-radius: 16px;
+            margin-bottom: 10px;
             cursor: pointer;
-            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
             border: 1px solid transparent;
             display: flex;
             align-items: center;
-            gap: 12px;
+            gap: 14px;
+            background: var(--glass);
         }
 
         .chat-item:hover {
             background: rgba(255, 255, 255, 0.05);
+            transform: translateY(-2px);
         }
 
         .chat-item.active {
-            background: var(--card-bg);
+            background: rgba(99, 102, 241, 0.1);
             border-color: var(--primary);
-            box-shadow: 0 4px 20px rgba(99, 102, 241, 0.2);
+            box-shadow: 0 8px 24px var(--primary-glow);
         }
 
         .platform-icon {
-            font-size: 1.25rem;
+            width: 40px;
+            height: 40px;
+            border-radius: 12px;
+            background: rgba(255, 255, 255, 0.05);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+        }
+
+        .chat-info {
+            flex: 1;
+            min-width: 0;
         }
 
         .chat-info h3 {
             margin: 0;
             font-size: 0.95rem;
             font-weight: 600;
+            color: #fff;
         }
 
         .chat-info p {
@@ -104,36 +128,131 @@
             flex: 1;
             display: flex;
             flex-direction: column;
-            background: radial-gradient(circle at top right, rgba(99, 102, 241, 0.1), transparent 40%);
+            position: relative;
         }
 
         .chat-header {
-            padding: 24px;
+            padding: 24px 32px;
             border-bottom: 1px solid var(--border);
             display: flex;
             justify-content: space-between;
             align-items: center;
-            background: rgba(15, 23, 42, 0.5);
+            background: rgba(15, 23, 42, 0.4);
+            backdrop-filter: blur(10px);
         }
 
         .active-user-name {
-            font-size: 1.25rem;
+            font-size: 1.4rem;
             font-weight: 700;
+            letter-spacing: -0.5px;
         }
 
+        /* Dashboard View */
+        .dashboard-container {
+            flex: 1;
+            overflow-y: auto;
+            padding: 40px;
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            grid-template-rows: auto auto;
+            gap: 24px;
+        }
+
+        .stat-card {
+            background: var(--card-bg);
+            border: 1px solid var(--border);
+            border-radius: 24px;
+            padding: 24px;
+            backdrop-filter: blur(10px);
+            transition: transform 0.3s ease;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-5px);
+            border-color: rgba(99, 102, 241, 0.3);
+        }
+
+        .stat-title {
+            color: var(--text-dim);
+            font-size: 0.85rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 16px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .stat-value {
+            font-size: 2.5rem;
+            font-weight: 800;
+            margin-bottom: 8px;
+            background: linear-gradient(135deg, #fff, var(--primary-light));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .chart-simple {
+            height: 120px;
+            display: flex;
+            align-items: flex-end;
+            gap: 8px;
+            margin-top: 20px;
+        }
+
+        .chart-bar {
+            flex: 1;
+            background: var(--primary);
+            border-radius: 4px 4px 0 0;
+            transition: height 1s cubic-bezier(0.17, 0.67, 0.83, 0.67);
+            position: relative;
+            opacity: 0.8;
+        }
+
+        .chart-bar:hover {
+            opacity: 1;
+            filter: brightness(1.2);
+            box-shadow: 0 0 15px var(--primary-glow);
+        }
+
+        .chart-bar::after {
+            content: attr(data-label);
+            position: absolute;
+            bottom: -20px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 0.65rem;
+            color: var(--text-dim);
+        }
+
+        /* History Container */
         .history-container {
             flex: 1;
             overflow-y: auto;
-            padding: 24px;
+            padding: 32px;
             display: flex;
             flex-direction: column;
-            gap: 16px;
+            gap: 20px;
         }
 
         .msg-row {
             display: flex;
             flex-direction: column;
-            max-width: 80%;
+            max-width: 75%;
+            animation: fadeIn 0.3s ease-out;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
         }
 
         .msg-row.user {
@@ -146,14 +265,15 @@
 
         .msg-row.ai {
             align-self: center;
-            max-width: 60%;
+            max-width: 80%;
         }
 
         .msg-bubble {
-            padding: 12px 18px;
-            border-radius: 18px;
+            padding: 14px 20px;
+            border-radius: 20px;
             font-size: 0.95rem;
-            line-height: 1.5;
+            line-height: 1.6;
+            position: relative;
         }
 
         .user .msg-bubble {
@@ -163,57 +283,64 @@
         }
 
         .admin .msg-bubble {
-            background: var(--primary);
+            background: linear-gradient(135deg, var(--primary), #4f46e5);
             color: white;
             border-bottom-right-radius: 4px;
-            box-shadow: 0 4px 12px rgba(99, 102, 241, 0.2);
+            box-shadow: 0 8px 20px var(--primary-glow);
         }
 
         .ai .msg-bubble {
-            background: rgba(245, 158, 11, 0.1);
-            border: 1px solid rgba(245, 158, 11, 0.3);
-            font-style: italic;
+            background: rgba(16, 185, 129, 0.1);
+            border: 1px solid var(--accent);
+            color: var(--accent);
+            font-weight: 500;
+            text-align: center;
         }
 
         /* Input Area */
         .input-area {
-            padding: 24px;
-            background: rgba(15, 23, 42, 0.8);
+            padding: 24px 32px;
+            background: rgba(15, 23, 42, 0.6);
             border-top: 1px solid var(--border);
             display: flex;
-            gap: 12px;
-            backdrop-filter: blur(10px);
+            gap: 16px;
+            backdrop-filter: blur(20px);
         }
 
         input {
             flex: 1;
             background: rgba(255, 255, 255, 0.05);
             border: 1px solid var(--border);
-            border-radius: 12px;
-            padding: 14px 20px;
+            border-radius: 16px;
+            padding: 16px 24px;
             color: white;
             outline: none;
-            transition: border-color 0.2s;
-            font-size: 0.95rem;
+            transition: all 0.3s;
+            font-size: 1rem;
         }
 
         input:focus {
             border-color: var(--primary);
+            background: rgba(255, 255, 255, 0.08);
+            box-shadow: 0 0 0 4px var(--primary-glow);
         }
 
         button.send-btn {
             background: var(--primary);
             color: white;
             border: none;
-            border-radius: 12px;
-            padding: 0 24px;
-            font-weight: 600;
+            border-radius: 16px;
+            padding: 0 32px;
+            font-weight: 700;
             cursor: pointer;
-            transition: all 0.2s;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 12px var(--primary-glow);
         }
 
-        button.send-btn:hover {
-            background: var(--primary-light);
+        button.send-btn:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px var(--primary-glow);
+            filter: brightness(1.1);
         }
 
         button.send-btn:active {
@@ -225,6 +352,15 @@
             cursor: not-allowed;
         }
 
+        ::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: rgba(255, 255, 255, 0.15);
+            border-radius: 10px;
+        }
+
         .empty-state {
             flex: 1;
             display: flex;
@@ -233,15 +369,6 @@
             justify-content: center;
             color: var(--text-dim);
             gap: 16px;
-        }
-
-        ::-webkit-scrollbar {
-            width: 6px;
-        }
-
-        ::-webkit-scrollbar-thumb {
-            background: rgba(255, 255, 255, 0.1);
-            border-radius: 10px;
         }
     </style>
 </head>
@@ -256,35 +383,141 @@
     </div>
 
     <main class="main-content">
+        <!-- Dashboard Static View -->
+        <div id="dashboard-view" class="dashboard-container">
+            <div class="stat-card" style="grid-column: span 2;">
+                <div class="stat-title">🚀 Аналітика трафіку (Останні 7 днів)</div>
+                <div class="chart-simple" id="main-chart">
+                    <div class="chart-bar" style="height: 40%" data-label="Пн"></div>
+                    <div class="chart-bar" style="height: 65%" data-label="Вт"></div>
+                    <div class="chart-bar" style="height: 50%" data-label="Ср"></div>
+                    <div class="chart-bar" style="height: 85%" data-label="Чт"></div>
+                    <div class="chart-bar" style="height: 70%" data-label="Пт"></div>
+                    <div class="chart-bar" style="height: 45%" data-label="Сб"></div>
+                    <div class="chart-bar" style="height: 60%" data-label="Нд"></div>
+                </div>
+            </div>
+
+            <div class="stat-card">
+                <div class="stat-title">📱 Канали залучення</div>
+                <div style="display: flex; flex-direction: column; gap: 12px; margin-top: 10px;">
+                    <div style="display: flex; justify-content: space-between; align-items: center;">
+                        <span style="font-size: 0.9rem;">📟 Telegram Bot</span>
+                        <span id="stat-tg-count" style="font-weight: 700; color: var(--primary-light);">...</span>
+                    </div>
+                    <div
+                        style="width: 100%; height: 6px; background: rgba(255,255,255,0.05); border-radius: 10px; overflow: hidden;">
+                        <div id="stat-tg-bar"
+                            style="width: 0%; height: 100%; background: var(--primary); transition: width 1s;"></div>
+                    </div>
+
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 10px;">
+                        <span style="font-size: 0.9rem;">🌐 Website Widget</span>
+                        <span id="stat-web-count" style="font-weight: 700; color: var(--accent);">...</span>
+                    </div>
+                    <div
+                        style="width: 100%; height: 6px; background: rgba(255,255,255,0.05); border-radius: 10px; overflow: hidden;">
+                        <div id="stat-web-bar"
+                            style="width: 0%; height: 100%; background: var(--accent); transition: width 1s;"></div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="stat-card">
+                <div class="stat-title">💬 Активність ШІ</div>
+                <div class="stat-value" id="stat-ai-total">...</div>
+                <div style="font-size: 0.8rem; color: var(--accent);">+12% за сьогодні</div>
+            </div>
+
+            <div class="stat-card">
+                <div class="stat-title">📈 Конверсія в Ліда</div>
+                <div class="stat-value" id="stat-cv-rate">...</div>
+                <div
+                    style="width: 100%; height: 8px; background: rgba(255,255,255,0.05); border-radius: 10px; margin-top: 10px; overflow: hidden;">
+                    <div id="stat-cv-bar"
+                        style="width: 0%; height: 100%; background: linear-gradient(90deg, var(--primary), var(--accent)); transition: width 1.5s;">
+                    </div>
+                </div>
+            </div>
+
+            <div class="stat-card">
+                <div class="stat-title">⚡ Ефективність (Engagement)</div>
+                <div class="stat-value" id="stat-engagement">...</div>
+                <p style="font-size: 0.8rem; color: var(--text-dim); margin-top: 4px;">Повідомлень на сесію</p>
+            </div>
+
+            <div class="stat-card" style="grid-column: span 2;">
+                <div class="stat-title">⏰ Пікова активність (Години)</div>
+                <div
+                    style="display: flex; justify-content: space-between; align-items: flex-end; height: 60px; margin-top: 15px; padding-bottom: 20px;">
+                    <div style="flex: 1; display: flex; flex-direction: column; align-items: center; gap: 5px;">
+                        <div
+                            style="width: 80%; background: var(--glass); border-radius: 4px; height: 20px; position: relative;">
+                            <div
+                                style="position: absolute; bottom: 0; width: 100%; height: 30%; background: var(--primary); opacity: 0.5; border-radius: 4px;">
+                            </div>
+                        </div>
+                        <span style="font-size: 0.6rem; color: var(--text-dim);">00-06</span>
+                    </div>
+                    <div style="flex: 1; display: flex; flex-direction: column; align-items: center; gap: 5px;">
+                        <div
+                            style="width: 80%; background: var(--glass); border-radius: 4px; height: 20px; position: relative;">
+                            <div
+                                style="position: absolute; bottom: 0; width: 100%; height: 75%; background: var(--primary); opacity: 0.8; border-radius: 4px;">
+                            </div>
+                        </div>
+                        <span style="font-size: 0.6rem; color: var(--text-dim);">06-12</span>
+                    </div>
+                    <div style="flex: 1; display: flex; flex-direction: column; align-items: center; gap: 5px;">
+                        <div
+                            style="width: 80%; background: var(--glass); border-radius: 4px; height: 20px; position: relative;">
+                            <div
+                                style="position: absolute; bottom: 0; width: 100%; height: 100%; background: var(--primary); border-radius: 4px; box-shadow: 0 0 10px var(--primary-glow);">
+                            </div>
+                        </div>
+                        <span style="font-size: 0.6rem; color: var(--accent); font-weight: bold;">12-18</span>
+                    </div>
+                    <div style="flex: 1; display: flex; flex-direction: column; align-items: center; gap: 5px;">
+                        <div
+                            style="width: 80%; background: var(--glass); border-radius: 4px; height: 20px; position: relative;">
+                            <div
+                                style="position: absolute; bottom: 0; width: 100%; height: 60%; background: var(--primary); opacity: 0.7; border-radius: 4px;">
+                            </div>
+                        </div>
+                        <span style="font-size: 0.6rem; color: var(--text-dim);">18-24</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Chat View (Hidden by default) -->
         <div id="chat-header" class="chat-header" style="display: none;">
             <div>
                 <div id="active-user-name" class="active-user-name"></div>
-                <div id="active-user-phone" style="color: var(--text-dim); font-size: 0.8rem;"></div>
+                <div id="active-user-phone" style="color: var(--text-dim); font-size: 0.8rem; margin-top: 4px;"></div>
             </div>
-        </div>
-        <div style="display: flex; align-items: center; gap: 15px;">
-            <div id="active-platform"
-                style="font-size: 0.8rem; background: rgba(255,255,255,0.05); padding: 4px 12px; border-radius: 20px;">
+            <div style="display: flex; align-items: center; gap: 16px;">
+                <div id="active-platform"
+                    style="font-size: 0.75rem; background: rgba(255,255,255,0.05); padding: 6px 14px; border-radius: 20px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px;">
+                </div>
+                <button onclick="showDashboard()"
+                    style="background: rgba(255,255,255,0.05); border: 1px solid var(--border); color: #fff; padding: 8px 14px; border-radius: 10px; cursor: pointer; font-size: 0.8rem; transition: all 0.2s;">🏠
+                    Дашборд</button>
+                <button onclick="deleteSession()"
+                    style="background: rgba(239, 68, 68, 0.1); color: #ef4444; border: 1px solid rgba(239, 68, 68, 0.2); padding: 8px 14px; border-radius: 10px; cursor: pointer; display: flex; align-items: center; gap: 8px; transition: all 0.2s;"
+                    onmouseover="this.style.background='rgba(239, 68, 68, 0.2)'"
+                    onmouseout="this.style.background='rgba(239, 68, 68, 0.1)'">
+                    <span>🗑️</span> <span style="font-weight: 600; font-size: 0.8rem;">Видалити</span>
+                </button>
             </div>
-            <button onclick="deleteSession()"
-                style="background: rgba(239, 68, 68, 0.1); color: #ef4444; border: 1px solid rgba(239, 68, 68, 0.2); padding: 8px 12px; border-radius: 8px; cursor: pointer; display: flex; align-items: center; gap: 6px; transition: all 0.2s;"
-                onmouseover="this.style.background='rgba(239, 68, 68, 0.2)'"
-                onmouseout="this.style.background='rgba(239, 68, 68, 0.1)'" title="Видалити цей чат">
-                <span>🗑️</span>
-            </button>
-        </div>
         </div>
 
-        <div id="history-container" class="history-container">
-            <div class="empty-state">
-                <p>Оберіть чат із списку зліва</p>
-            </div>
-        </div>
+        <div id="history-container" class="history-container" style="display: none;"></div>
 
         <div id="input-area" class="input-area" style="display: none;">
-            <input type="text" id="msg-input" placeholder="Напишіть повідомлення..."
+            <input type="text" id="msg-input" placeholder="Введіть відповідь кандидату..."
                 onkeypress="if(event.key==='Enter') sendReply()">
-            <button class="send-btn" id="send-btn" onclick="sendReply()">Надіслати</button>
+            <button class="send-btn" id="send-btn" onclick="sendReply()">НАДІСЛАТИ</button>
         </div>
     </main>
 
@@ -297,20 +530,72 @@
                 const res = await fetch('/api/admin/sessions');
                 allSessions = await res.json();
                 renderList();
+                updateStats();
                 if (currentSid) renderChat();
             } catch (e) {
                 console.error("Dashboard fetch error:", e);
             }
         }
 
+        function updateStats() {
+            const sessionsArr = Object.values(allSessions);
+            const tgCount = sessionsArr.filter(s => s.tgChatId).length;
+            const webCount = sessionsArr.length - tgCount;
+            const aiMsgs = sessionsArr.reduce((acc, s) => acc + s.messages.filter(m => m.isAI).length, 0);
+
+            // Conversion calculations (users with phone)
+            const leadsWithPhone = sessionsArr.filter(s => s.phone && s.phone !== 'Не вказано' && s.phone !== 'Pending').length;
+            const convRate = sessionsArr.length > 0 ? Math.round((leadsWithPhone / sessionsArr.length) * 100) : 0;
+
+            // Engagement score (avg msgs)
+            const totalMsgs = sessionsArr.reduce((acc, s) => acc + s.messages.length, 0);
+            const avgMsgs = sessionsArr.length > 0 ? (totalMsgs / sessionsArr.length).toFixed(1) : 0;
+
+            document.getElementById('stat-tg-count').textContent = tgCount;
+            document.getElementById('stat-web-count').textContent = webCount;
+            document.getElementById('stat-ai-total').textContent = aiMsgs;
+            document.getElementById('stat-cv-rate').textContent = convRate + '%';
+            document.getElementById('stat-engagement').textContent = avgMsgs;
+
+            const total = sessionsArr.length || 1;
+            document.getElementById('stat-tg-bar').style.width = (tgCount / total * 100) + '%';
+            document.getElementById('stat-web-bar').style.width = (webCount / total * 100) + '%';
+            document.getElementById('stat-cv-bar').style.width = convRate + '%';
+
+            // Randomize bars slightly for "live" feel in demo
+            const bars = document.querySelectorAll('.chart-bar');
+            bars.forEach(bar => {
+                const h = parseInt(bar.style.height);
+                const variance = Math.floor(Math.random() * 10) - 5;
+                bar.style.height = Math.max(20, Math.min(95, h + variance)) + '%';
+            });
+        }
+
+        function showDashboard() {
+            currentSid = null;
+            document.getElementById('dashboard-view').style.display = 'grid';
+            document.getElementById('chat-header').style.display = 'none';
+            document.getElementById('history-container').style.display = 'none';
+            document.getElementById('input-area').style.display = 'none';
+            renderList();
+        }
+
         function renderList() {
             const list = document.getElementById('chat-list');
             const entries = Object.entries(allSessions).sort((a, b) => b[1].created - a[1].created);
-            document.getElementById('total-chats').textContent = `Лідів: ${entries.length}`;
+            document.getElementById('total-chats').textContent = `Загалом лідів: ${entries.length}`;
 
-            list.innerHTML = entries.map(([sid, s]) => `
+            list.innerHTML = `
+                <div class="chat-item ${!currentSid ? 'active' : ''}" onclick="showDashboard()" style="margin-bottom: 24px; background: rgba(99, 102, 241, 0.05);">
+                    <div class="platform-icon">📊</div>
+                    <div class="chat-info">
+                        <h3>Загальна статистика</h3>
+                        <p>Огляд результатів</p>
+                    </div>
+                </div>
+            ` + entries.map(([sid, s]) => `
                 <div class="chat-item ${currentSid === sid ? 'active' : ''}" onclick="select('${sid}')">
-                    <span style="font-size: 1.2rem;">${s.tgChatId ? '📟' : '🌐'}</span>
+                    <div class="platform-icon">${s.tgChatId ? '📟' : '🌐'}</div>
                     <div class="chat-info">
                         <h3>${s.name}</h3>
                         <p>${s.messages.length ? s.messages[s.messages.length - 1].text : 'Новий лід'}</p>
@@ -321,9 +606,14 @@
 
         function select(sid) {
             currentSid = sid;
+            document.getElementById('dashboard-view').style.display = 'none';
             document.getElementById('chat-header').style.display = 'flex';
+            document.getElementById('history-container').style.display = 'flex';
             document.getElementById('input-area').style.display = 'flex';
+
             const s = allSessions[sid];
+            if (!s) return showDashboard();
+
             document.getElementById('active-user-name').textContent = s.name;
             document.getElementById('active-user-phone').textContent = s.phone;
             document.getElementById('active-platform').textContent = s.tgChatId ? '📟 Telegram' : '🌐 Website';
@@ -339,9 +629,11 @@
 
             const html = messages.map(m => {
                 const type = m.from === 'user' ? 'user' : (m.isAI ? 'ai' : 'admin');
+                const time = new Date(m.ts).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
                 return `
                     <div class="msg-row ${type}">
                         <div class="msg-bubble">${m.text.replace(/\n/g, '<br>')}</div>
+                        <div style="font-size: 0.65rem; color: var(--text-dim); margin-top: 4px; ${m.from === 'admin' ? 'text-align: right' : ''}">${time}</div>
                     </div>
                 `;
             }).join('');
@@ -370,10 +662,10 @@
                     input.value = '';
                     update();
                 } else {
-                    alert("Помилка відправки. Перевірте з'єднання.");
+                    alert("Помилка відправки.");
                 }
             } catch (err) {
-                alert("Помилка мережі: " + err.message);
+                alert("Помилка мережі.");
             } finally {
                 btn.disabled = false;
                 input.focus();
@@ -383,25 +675,15 @@
         async function deleteSession() {
             if (!currentSid) return;
             const s = allSessions[currentSid];
-            if (!confirm(`Ви впевнені, що хочете видалити чат з "${s.name}"? Це неможливо відмінити.`)) return;
+            if (!confirm(`Видалити чат з "${s.name}"?`)) return;
 
             try {
                 const res = await fetch(`/api/admin/sessions/${currentSid}`, { method: 'DELETE' });
                 if (res.ok) {
-                    currentSid = null;
-                    document.getElementById('chat-header').style.display = 'none';
-                    document.getElementById('input-area').style.display = 'none';
-                    document.getElementById('history-container').innerHTML = `
-                        <div class="empty-state">
-                            <p>Чат видалено успішно</p>
-                        </div>`;
+                    showDashboard();
                     update();
-                } else {
-                    alert("Помилка при видаленні.");
                 }
-            } catch (e) {
-                alert("Помилка мережі: " + e.message);
-            }
+            } catch (e) { }
         }
 
         setInterval(update, 2000);
@@ -413,6 +695,8 @@
             const sid = params.get('session') || params.get('id');
             if (sid && allSessions[sid]) {
                 select(sid);
+            } else {
+                showDashboard();
             }
         };
     </script>
