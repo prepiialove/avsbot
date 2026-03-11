@@ -8,7 +8,7 @@ const path = require('path');
 const app = express();
 const PORT = process.env.PORT || 3001;
 const TELEGRAM_TOKEN = process.env.TELEGRAM_TOKEN;
-const GEMINI_API_KEY = process.env.GEMINI_API_KEY || 'AIzaSyDY_azaCRtT-0buTTseFFhDqNxZdBnlyDE';
+const GEMINI_API_KEY = process.env.GEMINI_API_KEY || 'AIzaSyDLKBbSQnK3kQX7YOsgYJnUZSKd358zNu4';
 const BASE_URL = 'https://avsbot.onrender.com';
 
 // ============================
@@ -165,7 +165,7 @@ async function getAIResponse(userMessage, customKey = null, customModel = null) 
 Використовуй термінологію компанії: воронки, вебінари, ліди, win-win комунікація, утримання дедлайнів, конверсія.
 Допомагай кандидату виглядати експертом. Відповідай українською мовою. ПИШИ ТІЛЬКИ ТЕКСТОМ без Markdown.`;
 
-    const MODELS = customModel ? [customModel] : ['gemini-1.5-flash', 'gemini-2.0-flash-exp', 'gemini-1.5-flash-latest', 'gemini-pro'];
+    const MODELS = customModel ? [customModel] : ['gemini-2.5-flash', 'gemini-2.5-pro', 'gemini-2.0-flash', 'gemini-1.5-flash'];
 
     for (const modelId of MODELS) {
         try {

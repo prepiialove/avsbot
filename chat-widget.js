@@ -78,8 +78,6 @@
     .avs-ai-banner { background: #eff6ff; border: 1px solid #bfdbfe; color: #1e40af; padding: 8px 12px; border-radius: 12px; font-size: 12px; margin-bottom: 5px; display: none; align-items: center; gap: 8px; font-weight: 500; }
     .avs-quick-btn { background: #fff; border: 1px solid #e2e8f0; border-radius: 14px; padding: 6px 14px; font-size: 12px; cursor: pointer; color: #475569; transition: all 0.2s; }
     .avs-quick-btn:hover { border-color: #2563eb; color: #2563eb; }
-    .avs-ai-mode-btn { background: linear-gradient(135deg, #2563eb, #7c3aed); color: white !important; border: none; font-weight: bold; }
-    .avs-ai-mode-btn.active { background: #ef4444 !important; }
     
     .avs-callback-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 2147483648; display: none; align-items: center; justify-content: center; backdrop-filter: blur(4px); }
     .avs-callback-card { background: white; padding: 30px; border-radius: 24px; width: 90%; max-width: 340px; text-align: center; box-shadow: 0 20px 40px rgba(0,0,0,0.2); position: relative; }
@@ -97,22 +95,21 @@
     <button class="avs-primary-btn avs-ai-widget-btn" id="avs-ai-toggle-btn"><span class="avs-btn-label">Запитати AI</span><i class="fa-solid fa-robot" style="font-size: 24px;"></i></button>
     <button class="avs-primary-btn avs-manager-btn" id="avs-toggle-btn"><span class="avs-btn-label">Написати Менеджеру</span><i class="fa-solid fa-comments" style="font-size: 24px;"></i></button>
     <div class="avs-popup" id="avs-popup-win">
-      <div class="avs-header">
-        <div><h4>Консультант AVS</h4><span style="font-size:10px; opacity:0.8;">🟢 Зараз у мережі</span></div>
+      <div class="avs-header" id="avs-chat-header">
+        <div><h4 id="avs-chat-title">Консультант AVS</h4><span style="font-size:10px; opacity:0.8;">🟢 Зараз у мережі</span></div>
         <div style="display:flex; gap:12px;">
           <button id="avs-logout-btn" class="avs-header-btn" title="Вийти"><i class="fa-solid fa-right-from-bracket"></i></button>
           <button id="avs-close-btn" class="avs-header-btn"><i class="fa-solid fa-xmark"></i></button>
         </div>
       </div>
       <div class="avs-chat-area" id="avs-chat-box">
-        <div class="avs-ai-banner" id="avs-ai-status-banner">🤖 Режим AI: Помічник відповідає на ваші питання</div>
+        <div class="avs-ai-banner" id="avs-ai-status-banner">🤖 Режим AI: Відповідає протягом секунди</div>
         <div class="avs-typing" id="avs-typing-indicator">🤖 ШІ думає...</div>
       </div>
       <div id="avs-tools" style="padding:12px; background:#fff; display:none; gap:8px; flex-direction:column; border-top:1px solid #f1f5f9;">
         <div style="display:flex; gap:6px; flex-wrap:wrap;">
             <button class="avs-quick-btn" data-faq="📍 Де ви знаходитесь?">📍 Локація</button>
             <button class="avs-quick-btn" data-faq="💰 Яка вартість послуг?">💰 Ціни</button>
-            <button class="avs-quick-btn avs-ai-mode-btn" id="avs-ai-start-btn">🤖 Запитати AI</button>
         </div>
       </div>
       <div class="avs-input-group" id="avs-input-container" style="display:none;">
@@ -148,15 +145,26 @@
   const msgInput = document.getElementById('avs-msg-input');
   const sendBtn = document.getElementById('avs-send-action');
   const aiBanner = document.getElementById('avs-ai-status-banner');
-  const aiBtn = document.getElementById('avs-ai-start-btn');
 
   function playAlert() { new Audio(SOUND_URL).play().catch(() => { }); }
 
   function updateAIModeUI() {
-    aiBtn.classList.toggle('active', aiChatMode); 
-    aiBtn.innerText = aiChatMode ? '🔙 Вимкнути AI' : '🤖 Запитати AI';
-    aiBanner.style.display = aiChatMode ? 'flex' : 'none'; 
-    msgInput.placeholder = aiChatMode ? 'Запитайте штучний інтелект...' : 'Напишіть нам...';
+    const header = document.getElementById('avs-chat-header');
+    const title = document.getElementById('avs-chat-title');
+    
+    if (aiChatMode) {
+      header.style.background = 'linear-gradient(135deg, #a855f7, #7e22ce)';
+      title.innerHTML = '🤖 AI Асистент AVS';
+      if (toolsGroup) toolsGroup.style.display = 'none';
+      aiBanner.style.display = 'flex'; 
+      msgInput.placeholder = 'Запитайте штучний інтелект...';
+    } else {
+      header.style.background = '#2563eb';
+      title.innerHTML = 'Консультант AVS';
+      if (toolsGroup && localStorage.getItem('avs_name')) toolsGroup.style.display = 'flex';
+      aiBanner.style.display = 'none'; 
+      msgInput.placeholder = 'Напишіть нам...';
+    }
   }
 
   function openChat(startInAIMode = false) {
@@ -173,7 +181,12 @@
     calBtn.style.display = 'none';
     
     if (!localStorage.getItem('avs_name')) showRegForm();
-    else { inputContainer.style.display = 'flex'; toolsGroup.style.display = 'flex'; loadHistory(); setTimeout(() => msgInput.focus(), 300); }
+    else { 
+      inputContainer.style.display = 'flex'; 
+      if (!aiChatMode) toolsGroup.style.display = 'flex'; 
+      loadHistory(); 
+      setTimeout(() => msgInput.focus(), 300); 
+    }
   }
   
   toggleBtn.onclick = () => openChat(false);
@@ -220,9 +233,10 @@
 
       // Transition UI
       inputContainer.style.display = 'flex';
-      toolsGroup.style.display = 'flex';
+      if (!aiChatMode) toolsGroup.style.display = 'flex';
       chatBox.innerHTML = '';
       loadHistory();
+      if (aiChatMode) addBubble("Ви перейшли в режим AI. Запитайте!", "bot", false, true);
     };
   }
 
@@ -268,11 +282,7 @@
     } catch (e) { typingInd.style.display = 'none'; }
   }
 
-  aiBtn.onclick = () => {
-    aiChatMode = !aiChatMode; 
-    updateAIModeUI();
-    if (aiChatMode) addBubble("Ви перейшли в режим AI. Запитайте!", "bot", false, true);
-  };
+
 
   document.querySelectorAll('.avs-quick-btn[data-faq]').forEach(btn => { btn.onclick = () => { msgInput.value = btn.getAttribute('data-faq'); doSend(); }; });
   sendBtn.onclick = doSend; msgInput.onkeydown = (e) => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); doSend(); } };
