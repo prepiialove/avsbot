@@ -5,7 +5,7 @@ const instruction = "Test";
 const userMessage = "Hello";
 
 async function test() {
-    const MODELS = ['gemini-2.0-flash', 'gemini-1.5-flash', 'gemini-1.5-pro'];
+    const MODELS = ['gemini-2.0-flash', 'gemini-flash-latest', 'gemini-pro-latest'];
     for (const modelId of MODELS) {
         try {
             const url = `https://generativelanguage.googleapis.com/v1beta/models/${modelId}:generateContent?key=${apiKey}`;
