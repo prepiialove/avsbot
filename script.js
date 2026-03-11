@@ -77,7 +77,10 @@ function openSettingsModal() {
 
     const currentKey = localStorage.getItem(GEMINI_API_KEY_STORAGE) || "";
     const currentModel = localStorage.getItem(GEMINI_MODEL_STORAGE) || DEFAULT_MODEL;
-    if (modalApiKey) modalApiKey.value = currentKey;
+    if (modalApiKey) {
+        modalApiKey.value = currentKey;
+        modalApiKey.placeholder = "Активно за замовчуванням (System Key)";
+    }
     if (modalModel) {
         modalModel.value = currentModel;
         if (!modalModel.value) modalModel.value = DEFAULT_MODEL;
@@ -142,6 +145,9 @@ if (aiChatBox && aiInput && aiSendBtn) {
         const msgDiv = document.createElement('div');
         msgDiv.className = `ai-message ${sender}`;
         msgDiv.innerHTML = text.replace(/\n/g, '<br>');
+        if (text.includes("Система:")) {
+            msgDiv.innerHTML += "<br><br><b>✅ AI Ключ встановлено за замовчуванням.</b>";
+        }
         aiChatBox.appendChild(msgDiv);
         aiChatBox.scrollTop = aiChatBox.scrollHeight;
     }
