@@ -165,7 +165,7 @@ async function getAIResponse(userMessage, customKey = null, customModel = null) 
 Використовуй термінологію компанії: воронки, вебінари, ліди, win-win комунікація, утримання дедлайнів, конверсія.
 Допомагай кандидату виглядати експертом. Відповідай українською мовою. ПИШИ ТІЛЬКИ ТЕКСТОМ без Markdown.`;
 
-    const MODELS = customModel ? [customModel] : ['gemini-2.0-flash', 'gemini-1.5-flash', 'gemini-1.5-flash-latest', 'gemini-pro'];
+    const MODELS = customModel ? [customModel] : ['gemini-1.5-flash', 'gemini-2.0-flash-exp', 'gemini-1.5-flash-latest', 'gemini-pro'];
 
     for (const modelId of MODELS) {
         try {
