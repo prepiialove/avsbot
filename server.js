@@ -151,15 +151,15 @@ function getOrCreateSession(sid, msg = null) {
 //  AI
 // ============================
 async function getAIResponse(userMessage, customKey = null, customModel = null) {
-    // Determine which key to use
-    const apiKey = customKey || GEMINI_API_KEY;
+    let apiKey = customKey || GEMINI_API_KEY;
+
+    // Safeguard: If the user accidentally pasted the key twice (78 chars) or added spaces
+    if (apiKey && apiKey.length > 39 && apiKey.startsWith('AIzaSy')) {
+        apiKey = apiKey.substring(0, 39);
+    }
 
     // If no key at all, we can't do anything
     if (!apiKey) return null;
-
-    // The aiEnabled flag is specifically for the Telegram Bot's auto-replies.
-    // The Web Assistant and custom key requests should still work.
-    // So we don't return null here anymore based on aiEnabled.
     const instruction = `Ти - Експерт-консультант компанії AVS EdTech та AI помічник для кандидата на вакансію PM. 
 Твоя мета - відповідати чітко, професійно та по суті на питання кандидатів про компанію та вакансію.
 
