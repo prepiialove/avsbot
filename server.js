@@ -430,36 +430,30 @@ replyTxt = await getAIResponse(message, customKey, model);
 });
 
 app.get('/api/admin/debug-ai', async (req, res) => {
-    let key = process.env.GEMINI_API_KEY;
-    let originalLength = key ? key.length : 0;
-    if (key && key.length > 39 && key.startsWith('AIzaSy')) {
-        key = key.substring(0, 39);
-    }
-    
-    let apiError = null;
-    let status = null;
+    const key = process.env.GEMINI_API_KEY;
+    const info = {
+        hasKey: !!key,
+        keyLength: key ? key.length : 0,
+        keyStart: key ? key.substring(0, 6) + '...' : 'none',
+        allowedModels: ALLOWED_MODELS,
+        envPort: process.env.PORT,
+        nodeVersion: process.version
+    };
+
+    if (!key) return res.json({ ...info, error: "GEMINI_API_KEY is missing in process.env" });
+
     try {
-        const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${key}`, {
+        const testModel = ALLOWED_MODELS[0];
+        const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${testModel}:generateContent?key=${key}`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ contents: [{ parts: [{ text: "test" }] }] })
+            body: JSON.stringify({ contents: [{ parts: [{ text: "ping" }] }] })
         });
-        status = response.status;
         const data = await response.json();
-        apiError = data.error || null;
+        res.json({ ...info, testModel, status: response.status, data });
     } catch (e) {
-        apiError = e.message;
+        res.json({ ...info, error: e.message });
     }
-
-    res.json({
-        hasKey: !!key,
-        originalLength,
-        trimmedLength: key ? key.length : 0,
-        start: key ? key.substring(0, 5) : null,
-        apiStatus: status,
-        apiError,
-        models: ['gemini-1.5-flash', 'gemini-1.5-pro']
-    });
 });
 app.get('/api/history', (req, res) => res.json({ messages: sessions.get(req.query.session)?.messages || [] }));
 app.get('/api/poll', (req, res) => {
