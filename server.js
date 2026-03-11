@@ -10,7 +10,7 @@ const PORT = process.env.PORT || 3001;
 const TELEGRAM_TOKEN = process.env.TELEGRAM_TOKEN;
 const GEMINI_API_KEY = process.env.GEMINI_API_KEY;
 const BASE_URL = 'https://avsbot.onrender.com';
-
+const ALLOWED_MODELS = ['gemini-1.5-flash', 'gemini-1.5-pro'];
 // ============================
 //  PROCESS SAFETY
 // ============================
@@ -177,7 +177,7 @@ async function getAIResponse(userMessage, customKey = null, customModel = null) 
 4. Якщо питають те, чого ти не знаєш (або не стосується AVS) - кажи: "Це питання найкраще обговорити з народи менеджером. Напишіть йому, перемкнувши режим чату."
 5. Коли вітаєшся, кажи: "Вітаю! Я AI помічник AVS EdTech. Чим можу допомогти з вакансією PM?"`;
 
-    const MODELS = customModel ? [customModel] : ['gemini-1.5-flash', 'gemini-1.5-pro'];
+    const MODELS = customModel && ALLOWED_MODELS.includes(customModel) ? [customModel] : ALLOWED_MODELS;
 
     for (const modelId of MODELS) {
         try {
@@ -201,7 +201,7 @@ async function getAIResponse(userMessage, customKey = null, customModel = null) 
             if (text) return text.replace(/[*_#`]/g, '').trim();
         } catch (e) { console.error(`[AI] Exception ${modelId}:`, e.message); }
     }
-    return null;
+    return 'No valid model available.';
 }
 
 // ============================
@@ -413,7 +413,11 @@ app.post('/api/ai_chat', async (req, res) => {
         await notifyAdmin(s, sessionId, false, null, false, true);
     }
 
-    let replyTxt = await getAIResponse(message, customKey, model);
+    let replyTxt;
+if (model && !ALLOWED_MODELS.includes(model)) {
+  return res.json({ error: `Model ${model} is not supported. Use one of: ${ALLOWED_MODELS.join(', ')}` });
+}
+replyTxt = await getAIResponse(message, customKey, model);
 
     if (!replyTxt) {
         return res.json({ reply: "Вибачте, сталася помилка при генерації відповіді. Спробуйте пізніше." });
