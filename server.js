@@ -442,18 +442,26 @@ app.get('/api/admin/debug-ai', async (req, res) => {
 
     if (!key) return res.json({ ...info, error: "GEMINI_API_KEY is missing in process.env" });
 
-    try {
-        const testModel = ALLOWED_MODELS[0];
-        const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${testModel}:generateContent?key=${key}`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ contents: [{ parts: [{ text: "ping" }] }] })
-        });
-        const data = await response.json();
-        res.json({ ...info, testModel, status: response.status, data });
-    } catch (e) {
-        res.json({ ...info, error: e.message });
+    const results = [];
+    for (const mId of ALLOWED_MODELS) {
+        try {
+            const resp = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${mId}:generateContent?key=${key}`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ contents: [{ parts: [{ text: "ping" }] }] })
+            });
+            const data = await resp.json();
+            results.push({ model: mId, status: resp.status, ok: !data.error, error: data.error?.message });
+        } catch (e) {
+            results.push({ model: mId, ok: false, error: e.message });
+        }
     }
+
+    res.json({
+        ...info,
+        overallStatus: results.some(r => r.ok) ? "OK" : "NO_WORKING_MODELS",
+        checks: results
+    });
 });
 app.get('/api/history', (req, res) => res.json({ messages: sessions.get(req.query.session)?.messages || [] }));
 app.get('/api/poll', (req, res) => {
