@@ -44,6 +44,7 @@
             color: white;
             flex-shrink: 0;
             box-shadow: 0 0 20px rgba(59, 130, 246, 0.5);
+            animation: pulseAvatar 3s infinite;
         }
 
         .transcript-section {
@@ -69,6 +70,12 @@
             background: rgba(139, 92, 246, 0.05);
             padding: 1.5rem;
             border-radius: 0 10px 10px 0;
+            transition: all 0.4s ease;
+        }
+
+        .quote-block:hover {
+            background: rgba(139, 92, 246, 0.1);
+            border-left-color: var(--accent-1);
         }
 
         .transcript-text p {
@@ -89,6 +96,32 @@
             padding: 1.5rem;
             margin-bottom: 1rem;
             border: 1px solid rgba(255, 255, 255, 0.05);
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .structured-list li:hover {
+            transform: translateY(-5px);
+            background: rgba(255, 255, 255, 0.06);
+            border-color: rgba(99, 102, 241, 0.3);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+        }
+
+        .step {
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            border-radius: 16px;
+            border: 1px solid transparent;
+        }
+
+        .step:hover {
+            background: rgba(255, 255, 255, 0.03);
+            transform: translateX(10px);
+            border-color: rgba(255, 255, 255, 0.05);
+        }
+
+        @keyframes pulseAvatar {
+            0% { box-shadow: 0 0 15px rgba(59, 130, 246, 0.4); }
+            50% { box-shadow: 0 0 30px rgba(59, 130, 246, 0.7); }
+            100% { box-shadow: 0 0 15px rgba(59, 130, 246, 0.4); }
         }
 
         .structured-list li h4 {
@@ -134,7 +167,7 @@
             </div>
 
             <div class="transcript-text">
-                <div class="quote-block">
+                <div class="quote-block reveal">
                     <p>Компанія AVS наразі активно шукає <span class="tooltip-trigger"
                             data-tooltip="pm-role">Project-менеджера<i
                                 class="fa-solid fa-circle-question tooltip-icon"></i></span> для розвитку проєкту на
@@ -162,7 +195,7 @@
                         У Польщі компанія забезпечує матеріали фаховою польською мовою для місцевих спеціалістів.</p>
                 </div>
 
-                <div class="transcript-section">
+                <div class="transcript-section reveal">
                     <h3><i class="fa-solid fa-bullseye"></i> Кого шукає компанія?</h3>
                     <p>Головне завдання майбутнього Project-менеджера — <span class="tooltip-trigger"
                             data-tooltip="scaling">масштабування вже існуючого проєкту в Польщі<i
@@ -183,7 +216,7 @@
                         винагорода керівника напряму залежить від досягнення цих результатів.</p>
                 </div>
 
-                <div class="transcript-section">
+                <div class="transcript-section reveal">
                     <h3><i class="fa-solid fa-list-check"></i> Три ключові вимоги до кандидата</h3>
                     <ul class="structured-list">
                         <li>
@@ -217,7 +250,7 @@
                     </ul>
                 </div>
 
-                <div class="transcript-section">
+                <div class="transcript-section reveal">
                     <h3><i class="fa-solid fa-sitemap"></i> Завдання та ключові етапи розвитку</h3>
                     <p>Стратегічне завдання кандидата полягає в управлінні бізнес-моделлю та її масштабуванні з
                         прив'язкою до фінансових KPI.</p>
@@ -278,7 +311,7 @@
                                     професійних очікувань кандидата з обох сторін.</p>
                             </div>
                         </div>
-                        <div class="step" style="padding: 1rem 0; width: 100%;">
+                        <div class="step reveal" style="padding: 1rem 0; width: 100%;">
                             <div class="step-num gradient-bg" style="width: 40px; height: 40px; font-size: 1.2rem;">2
                             </div>
                             <div>
@@ -288,7 +321,7 @@
                                     фокусуючись на реальній мотивації.</p>
                             </div>
                         </div>
-                        <div class="step" style="padding: 1rem 0; width: 100%;">
+                        <div class="step reveal" style="padding: 1rem 0; width: 100%;">
                             <div class="step-num gradient-bg" style="width: 40px; height: 40px; font-size: 1.2rem;">3
                             </div>
                             <div>
@@ -297,7 +330,7 @@
                                     винятково у разі повного збігу очікувань на попередніх етапах.</p>
                             </div>
                         </div>
-                        <div class="step" style="padding: 1rem 0; width: 100%;">
+                        <div class="step reveal" style="padding: 1rem 0; width: 100%;">
                             <div class="step-num gradient-bg" style="width: 40px; height: 40px; font-size: 1.2rem;">4
                             </div>
                             <div>
@@ -306,7 +339,7 @@
                                     маркетингу та проєктному менеджменті.</p>
                             </div>
                         </div>
-                        <div class="step" style="padding: 1rem 0; width: 100%;">
+                        <div class="step reveal" style="padding: 1rem 0; width: 100%;">
                             <div class="step-num gradient-bg" style="width: 40px; height: 40px; font-size: 1.2rem;">5
                             </div>
                             <div>
