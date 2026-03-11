@@ -285,9 +285,17 @@ bot.on('message', async (msg) => {
             const sArr = Array.from(sessions.values());
             return safeSend(adminChatId, `📊 *Статистика:*\n\n👥 Лідів: ${sArr.length}\n📟 TG: ${sArr.filter(s => s.tgChatId).length}\n🌐 Web: ${sArr.filter(s => !s.tgChatId).length}`);
         }
-        if (msg.text === '🟢 Увімкнути AI' || msg.text === '🔴 Вимкнути AI' || msg.text === '🤖 AI: Увімк/Вимк') {
+        if (msg.text === '🟢 Увімкнути AI') {
+            aiEnabled = true;
+            return safeSend(adminChatId, `🤖 Стан AI: 🟢 УВІМКНЕНО`, { reply_markup: getAdminKeyboard() });
+        }
+        if (msg.text === '🔴 Вимкнути AI') {
+            aiEnabled = false;
+            return safeSend(adminChatId, `🤖 Стан AI: 🔴 ВИМКНЕНО`, { reply_markup: getAdminKeyboard() });
+        }
+        if (msg.text === '🤖 AI: Увімк/Вимк') {
             aiEnabled = !aiEnabled;
-            return safeSend(adminChatId, `🤖 Стан AI змінено на: ${aiEnabled ? '🟢 УВІМКНЕНО' : '🔴 ВИМКНЕНО'}`, { reply_markup: getAdminKeyboard() });
+            return safeSend(adminChatId, `🤖 Стан AI: ${aiEnabled ? '🟢 УВІМКНЕНО' : '🔴 ВИМКНЕНО'}`, { reply_markup: getAdminKeyboard() });
         }
         if (msg.text === '⚡️ Швидкі Скрипти') return safeSend(adminChatId, 'Оберіть скрипт:', { reply_markup: SCRIPTS_KEYBOARD });
         if (msg.text === '🔙 Назад') { adminReplyTarget.delete(adminChatId); return safeSend(adminChatId, 'Головне меню:', { reply_markup: getAdminKeyboard() }); }
@@ -410,8 +418,10 @@ app.post('/api/ai_chat', async (req, res) => {
     }
 
     // Check if AI is globally enabled or if a custom key is provided (which overrides for testing)
+    console.log(`[AI-API] Request from session ${sessionId}. Global AI state: ${aiEnabled ? 'ON' : 'OFF'}`);
     if (!aiEnabled && !customKey) {
-        return res.json({ reply: "Режим AI зараз вимкнено менеджером. Перейдіть у режим Менеджера для спілкування." });
+        console.log(`[AI-API] AI is disabled. Blocking request.`);
+        return res.json({ reply: "Менеджер тимчасово вимкнув AI-асистента. Будь ласка, зачекайте на відповідь оператора або перемкніться на Менеджера." });
     }
 
     let replyTxt;
@@ -435,6 +445,7 @@ app.post('/api/ai_chat', async (req, res) => {
 app.get('/api/admin/debug-ai', async (req, res) => {
     const key = process.env.GEMINI_API_KEY;
     const info = {
+        aiEnabled: aiEnabled,
         hasKey: !!key,
         keyLength: key ? key.length : 0,
         keyStart: key ? key.substring(0, 6) + '...' : 'none',
