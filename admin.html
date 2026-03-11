@@ -473,6 +473,21 @@
     </div>
 
     <main class="main-content">
+        <!-- New Top Navigation -->
+        <div id="admin-top-nav"
+            style="display: none; justify-content: flex-end; padding: 16px 32px; border-bottom: 1px solid var(--border); background: rgba(15, 23, 42, 0.4); backdrop-filter: blur(10px); gap: 12px; align-items: center;">
+            <span id="nav-user-info" style="font-size: 0.85rem; color: var(--text-dim); margin-right: auto;">👤
+                Адміністратор</span>
+            <button onclick="showDashboard()"
+                style="background: rgba(255,255,255,0.05); border: 1px solid var(--border); color: #fff; padding: 8px 16px; border-radius: 10px; cursor: pointer; font-size: 0.85rem; font-weight: 600; transition: all 0.2s; display: flex; align-items: center; gap: 8px;">
+                🏠 Дашборд
+            </button>
+            <button onclick="localStorage.removeItem('admin_auth'); location.reload();"
+                style="background: rgba(255,255,255,0.05); border: 1px solid var(--border); color: #94a3b8; padding: 8px 16px; border-radius: 10px; cursor: pointer; font-size: 0.85rem; font-weight: 600; transition: all 0.2s; display: flex; align-items: center; gap: 8px;">
+                🚪 Вихід
+            </button>
+        </div>
+
         <!-- Dashboard Static View -->
         <div id="dashboard-view" class="dashboard-container">
             <div class="stat-card" style="grid-column: span 2;">
@@ -661,6 +676,7 @@
             if (user === 'admin' && pass === 'admin') {
                 localStorage.setItem('admin_auth', 'true');
                 document.getElementById('auth-overlay').style.display = 'none';
+                document.getElementById('admin-top-nav').style.display = 'flex';
                 update();
             } else {
                 error.style.display = 'block';
@@ -670,6 +686,7 @@
         // Check auth on load
         if (localStorage.getItem('admin_auth') === 'true') {
             document.getElementById('auth-overlay').style.display = 'none';
+            document.getElementById('admin-top-nav').style.display = 'flex';
         }
 
         async function update() {
@@ -723,6 +740,7 @@
         function showDashboard() {
             currentSid = null;
             document.getElementById('dashboard-view').style.display = 'grid';
+            document.getElementById('admin-top-nav').style.display = 'flex';
             document.getElementById('chat-header').style.display = 'none';
             document.getElementById('history-container').style.display = 'none';
             document.getElementById('template-area').style.display = 'none';
