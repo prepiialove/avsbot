@@ -631,8 +631,9 @@
         }
 
         async function sendCalendar() {
-            const input = document.getElementById('msg-input');
-            input.value = "Будь ласка, оберіть зручний час для співбесіди за цим посиланням: https://calendly.com/avs-edtech/interview";
+            const link = 'https://calendly.com/prepiialove/30min?month=2026-03&date=2026-03-11';
+            const msg = `📅 Пропонуємо вам обрати зручний час для інтерв'ю у нашому календарі: ${link}`;
+            document.getElementById('msg-input').value = msg;
             sendReply();
         }
 

@@ -6,7 +6,7 @@
   const SID_KEY = 'avs_final_sid';
   const SOUND_URL = 'https://assets.mixkit.co/active_storage/sfx/2354/2354-preview.mp3';
   const TG_LINK = 'https://t.me/avswebbot'; // Correct Telegram bot
-  const CALENDLY_LINK = 'https://calendly.com/prepiialove/30min';
+  const CALENDLY_LINK = 'https://calendly.com/prepiialove/30min?month=2026-03&date=2026-03-11';
 
   let sessionId = localStorage.getItem(SID_KEY);
   if (!sessionId) {
