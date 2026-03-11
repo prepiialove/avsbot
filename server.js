@@ -35,8 +35,12 @@ function loadSessions() {
     if (fs.existsSync(SESSIONS_FILE)) {
         try {
             const data = JSON.parse(fs.readFileSync(SESSIONS_FILE, 'utf8'));
+            if (data._global) {
+                aiEnabled = data._global.aiEnabled !== undefined ? data._global.aiEnabled : true;
+                delete data._global; // clean up before loading Map
+            }
             sessions = new Map(Object.entries(data));
-            console.log(`[Sessions] Loaded ${sessions.size} sessions.`);
+            console.log(`[Sessions] Loaded ${sessions.size} sessions. AI Enabled: ${aiEnabled}`);
         } catch (err) { console.error('[Error] Loading sessions:', err); }
     } else {
         sessions = new Map();
@@ -48,6 +52,7 @@ loadSessions();
 function saveSessions() {
     try {
         const obj = Object.fromEntries(sessions);
+        obj._global = { aiEnabled }; // Store global state
         fs.writeFileSync(SESSIONS_FILE, JSON.stringify(obj, null, 2));
     } catch (err) { console.error('[Error] Saving sessions:', err); }
 }
@@ -245,7 +250,7 @@ bot.onText(/\/start/, async (msg) => {
     const isAdmin = String(msg.chat.id) === String(adminChatId);
     if (isAdmin) {
         const adminUrl = `${BASE_URL}/admin.html`;
-        await safeSend(adminChatId, `👋 *Панель Адміна* (v4.43)\n\n🤖 Стан AI: ${aiEnabled ? '🟢 УВІМКНЕНО' : '🔴 ВИМКНЕНО'}`, { reply_markup: getAdminKeyboard() });
+        await safeSend(adminChatId, `👋 *Панель Адміна* (v4.44)\n\n🤖 Стан AI: ${aiEnabled ? '🟢 УВІМКНЕНО' : '🔴 ВИМКНЕНО'}`, { reply_markup: getAdminKeyboard() });
         return safeSend(adminChatId, `🚀 *Швидкий доступ:*`, {
             reply_markup: {
                 inline_keyboard: [
@@ -509,4 +514,4 @@ app.post('/api/callback', async (req, res) => {
     res.json({ ok: true });
 });
 
-app.listen(PORT, () => console.log(`🚀 AI Rich Scripts v4.43: ${BASE_URL}`));
+app.listen(PORT, () => console.log(`🚀 AI Rich Scripts v4.44: ${BASE_URL}`));
