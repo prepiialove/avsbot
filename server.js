@@ -10,7 +10,7 @@ const PORT = process.env.PORT || 3001;
 const TELEGRAM_TOKEN = process.env.TELEGRAM_TOKEN;
 const GEMINI_API_KEY = process.env.GEMINI_API_KEY;
 const BASE_URL = 'https://avsbot.onrender.com';
-const ALLOWED_MODELS = ['gemini-1.5-flash', 'gemini-1.5-pro'];
+const ALLOWED_MODELS = ['gemini-2.0-flash', 'gemini-1.5-flash', 'gemini-1.5-pro'];
 // ============================
 //  PROCESS SAFETY
 // ============================
@@ -153,10 +153,8 @@ function getOrCreateSession(sid, msg = null) {
 async function getAIResponse(userMessage, customKey = null, customModel = null) {
     let apiKey = customKey || GEMINI_API_KEY;
 
-    // Safeguard: If the user accidentally pasted the key twice (78 chars) or added spaces
-    if (apiKey && apiKey.length > 39 && apiKey.startsWith('AIzaSy')) {
-        apiKey = apiKey.substring(0, 39);
-    }
+    // Safeguard: remove accidental whitespace only
+    if (apiKey) apiKey = apiKey.trim();
 
     // If no key at all, we can't do anything
     if (!apiKey) return null;
