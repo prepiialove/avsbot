@@ -165,7 +165,7 @@ async function getAIResponse(userMessage, customKey = null, customModel = null) 
 Використовуй термінологію компанії: воронки, вебінари, ліди, win-win комунікація, утримання дедлайнів, конверсія.
 Допомагай кандидату виглядати експертом. Відповідай українською мовою. ПИШИ ТІЛЬКИ ТЕКСТОМ без Markdown.`;
 
-    const MODELS = customModel ? [customModel] : ['gemini-2.0-flash', 'gemini-1.5-flash', 'gemini-1.5-flash-latest'];
+    const MODELS = customModel ? [customModel] : ['gemini-2.0-flash', 'gemini-1.5-flash', 'gemini-1.5-flash-latest', 'gemini-pro'];
 
     for (const modelId of MODELS) {
         try {
@@ -402,7 +402,7 @@ app.post('/api/ai_chat', async (req, res) => {
     let replyTxt = await getAIResponse(message, customKey, model);
 
     if (!replyTxt) {
-        return res.json({ reply: "Зачекайте на відповідь менеджера або перевірте налаштування AI." });
+        return res.json({ reply: "Вибачте, сталася помилка при генерації відповіді. Спробуйте пізніше." });
     }
 
     if (s) {
