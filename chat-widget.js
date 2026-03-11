@@ -21,7 +21,26 @@
   style.textContent = `
     .avs-widget-container { position: fixed; bottom: 20px; right: 20px; z-index: 2147483647; width: 60px; height: 60px; transition: all 0.3s cubic-bezier(0.18, 0.89, 0.32, 1.28); }
     .avs-widget-container.open { width: 360px; height: 620px; }
-    .avs-button { width: 60px; height: 60px; border-radius: 50%; background: #2563eb; color: white; border: none; cursor: pointer; display: flex; align-items: center; justify-content: center; position: absolute; bottom: 0; right: 0; box-shadow: 0 10px 25px rgba(37,99,235,0.4); z-index: 10; }
+    .avs-primary-btn { 
+      position: fixed; right: 20px; 
+      height: 60px; border-radius: 30px; 
+      display: flex; align-items: center; justify-content: flex-end; 
+      padding: 0 18px; color: white; border: none; cursor: pointer; 
+      box-shadow: 0 10px 25px rgba(0,0,0,0.3); 
+      transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); 
+      z-index: 2147483647; text-decoration: none; overflow: hidden;
+      width: 60px;
+    }
+    .avs-primary-btn:hover { width: auto; padding-left: 24px; min-width: 210px; transform: translateX(-5px); }
+    .avs-primary-btn .avs-btn-label {
+      white-space: nowrap; opacity: 0; transform: translateX(10px); 
+      transition: all 0.3s ease; font-weight: 600; font-size: 15px; 
+      margin-right: 14px; pointer-events: none;
+    }
+    .avs-primary-btn:hover .avs-btn-label { opacity: 1; transform: translateX(0); }
+    
+    .avs-manager-btn { background: linear-gradient(135deg, #2563eb, #1e40af); bottom: 20px; }
+    .avs-ai-widget-btn { background: linear-gradient(135deg, #a855f7, #7e22ce); bottom: 95px; }
     
     .avs-floating-btn { 
       position: fixed; right: 26px; 
@@ -33,17 +52,17 @@
       z-index: 2147483646; text-decoration: none; overflow: hidden;
       width: 48px;
     }
-    .avs-floating-btn:hover { width: auto; padding-left: 20px; min-width: 160px; transform: translateX(-5px); }
-    .avs-btn-label { 
+    .avs-floating-btn:hover { width: auto; padding-left: 20px; min-width: 170px; transform: translateX(-5px); }
+    .avs-floating-btn .avs-btn-label { 
       white-space: nowrap; opacity: 0; transform: translateX(10px); 
       transition: all 0.3s ease; font-weight: 600; font-size: 13px; 
       margin-right: 12px; pointer-events: none;
     }
     .avs-floating-btn:hover .avs-btn-label { opacity: 1; transform: translateX(0); }
 
-    .avs-cal-btn { background: linear-gradient(135deg, #8b5cf6, #7c3aed); bottom: 205px; box-shadow: 0 8px 20px rgba(139, 92, 246, 0.3); }
-    .avs-tg-btn { background: linear-gradient(135deg, #0088cc, #00a2ed); bottom: 145px; box-shadow: 0 8px 20px rgba(0,136,204,0.3); }
-    .avs-call-btn { background: linear-gradient(135deg, #10b981, #059669); bottom: 85px; box-shadow: 0 8px 20px rgba(16,185,129,0.3); }
+    .avs-cal-btn { background: linear-gradient(135deg, #f43f5e, #e11d48); bottom: 290px; box-shadow: 0 8px 20px rgba(244,63,94,0.3); }
+    .avs-tg-btn { background: linear-gradient(135deg, #0088cc, #00a2ed); bottom: 230px; box-shadow: 0 8px 20px rgba(0,136,204,0.3); }
+    .avs-call-btn { background: linear-gradient(135deg, #10b981, #059669); bottom: 170px; box-shadow: 0 8px 20px rgba(16,185,129,0.3); }
 
     .avs-popup { position: absolute; bottom: 0; right: 0; width: 100%; height: 100%; background: #fff; border-radius: 28px; border: 1px solid #e2e8f0; box-shadow: 0 30px 60px rgba(0,0,0,0.15); display: none; flex-direction: column; overflow: hidden; }
     .avs-header { background: #2563eb; color: white; padding: 18px 20px; display: flex; align-items: center; justify-content: space-between; }
@@ -75,7 +94,8 @@
     <a href="${CALENDLY_LINK}" target="_blank" class="avs-floating-btn avs-cal-btn" id="avs-fast-cal-btn"><span class="avs-btn-label">Зарезервувати місце</span><i class="fa-solid fa-calendar-days" style="font-size: 20px;"></i></a>
     <a href="${TG_LINK}" target="_blank" class="avs-floating-btn avs-tg-btn" id="avs-fast-tg-btn"><span class="avs-btn-label">Telegram Бот</span><i class="fa-brands fa-telegram" style="font-size: 24px;"></i></a>
     <button class="avs-floating-btn avs-call-btn" id="avs-fast-call-btn"><span class="avs-btn-label">Замовити дзвінок</span><i class="fa-solid fa-phone" style="font-size: 18px;"></i></button>
-    <button class="avs-button" id="avs-toggle-btn"><i class="fa-solid fa-comments" style="font-size: 24px;"></i></button>
+    <button class="avs-primary-btn avs-ai-widget-btn" id="avs-ai-toggle-btn"><span class="avs-btn-label">Запитати AI</span><i class="fa-solid fa-robot" style="font-size: 24px;"></i></button>
+    <button class="avs-primary-btn avs-manager-btn" id="avs-toggle-btn"><span class="avs-btn-label">Написати Менеджеру</span><i class="fa-solid fa-comments" style="font-size: 24px;"></i></button>
     <div class="avs-popup" id="avs-popup-win">
       <div class="avs-header">
         <div><h4>Консультант AVS</h4><span style="font-size:10px; opacity:0.8;">🟢 Зараз у мережі</span></div>
@@ -115,6 +135,8 @@
   document.body.appendChild(container);
 
   const toggleBtn = document.getElementById('avs-toggle-btn');
+  const aiWidgetBtn = document.getElementById('avs-ai-toggle-btn');
+  const calBtn = document.getElementById('avs-fast-cal-btn');
   const callBtn = document.getElementById('avs-fast-call-btn');
   const tgBtn = document.getElementById('avs-fast-tg-btn');
   const callOverlay = document.getElementById('avs-call-overlay');
@@ -130,13 +152,44 @@
 
   function playAlert() { new Audio(SOUND_URL).play().catch(() => { }); }
 
-  function openChat() {
-    isChatOpen = true; container.classList.add('open'); popup.style.display = 'flex'; toggleBtn.style.display = 'none'; callBtn.style.display = 'none'; tgBtn.style.display = 'none'; document.getElementById('avs-fast-cal-btn').style.display = 'none';
+  function updateAIModeUI() {
+    aiBtn.classList.toggle('active', aiChatMode); 
+    aiBtn.innerText = aiChatMode ? '🔙 Вимкнути AI' : '🤖 Запитати AI';
+    aiBanner.style.display = aiChatMode ? 'flex' : 'none'; 
+    msgInput.placeholder = aiChatMode ? 'Запитайте штучний інтелект...' : 'Напишіть нам...';
+  }
+
+  function openChat(startInAIMode = false) {
+    aiChatMode = startInAIMode;
+    updateAIModeUI();
+    
+    isChatOpen = true; 
+    container.classList.add('open'); 
+    popup.style.display = 'flex'; 
+    toggleBtn.style.display = 'none'; 
+    aiWidgetBtn.style.display = 'none';
+    callBtn.style.display = 'none'; 
+    tgBtn.style.display = 'none'; 
+    calBtn.style.display = 'none';
+    
     if (!localStorage.getItem('avs_name')) showRegForm();
     else { inputContainer.style.display = 'flex'; toolsGroup.style.display = 'flex'; loadHistory(); setTimeout(() => msgInput.focus(), 300); }
   }
-  toggleBtn.onclick = openChat;
-  document.getElementById('avs-close-btn').onclick = () => { isChatOpen = false; container.classList.remove('open'); popup.style.display = 'none'; toggleBtn.style.display = 'flex'; callBtn.style.display = 'flex'; tgBtn.style.display = 'flex'; document.getElementById('avs-fast-cal-btn').style.display = 'flex'; };
+  
+  toggleBtn.onclick = () => openChat(false);
+  aiWidgetBtn.onclick = () => openChat(true);
+  
+  document.getElementById('avs-close-btn').onclick = () => { 
+    isChatOpen = false; 
+    container.classList.remove('open'); 
+    popup.style.display = 'none'; 
+    toggleBtn.style.display = 'flex'; 
+    aiWidgetBtn.style.display = 'flex';
+    callBtn.style.display = 'flex'; 
+    tgBtn.style.display = 'flex'; 
+    calBtn.style.display = 'flex'; 
+  };
+
   document.getElementById('avs-logout-btn').onclick = () => { if (confirm('Вийти з профілю?')) { localStorage.clear(); location.reload(); } };
 
   callBtn.onclick = () => { callOverlay.style.display = 'flex'; document.getElementById('avs-call-phone').value = localStorage.getItem('avs_phone') || ''; document.getElementById('avs-call-phone').focus(); };
@@ -150,7 +203,7 @@
 
   function showRegForm() {
     inputContainer.style.display = 'none'; toolsGroup.style.display = 'none';
-    chatBox.innerHTML = `<div style="padding:40px 20px; text-align:center; display:flex; flex-direction:column; gap:12px;"><h3>👋 Вітаємо!</h3><p>Як ми можемо до вас звертатися?</p><input type="text" id="r-name" placeholder="Ваше ім'я" style="padding:14px; border:1px solid #cbd5e1; border-radius:14px; font-size:14px; outline:none;"><input type="text" id="r-phone" placeholder="Телефон / Telegram" style="padding:14px; border:1px solid #cbd5e1; border-radius:14px; font-size:14px; outline:none;"><button id="r-submit" style="background:#2563eb; color:white; border:none; padding:14px; border-radius:14px; cursor:pointer; font-weight:bold; margin-top:10px; box-shadow: 0 4px 12px rgba(37,99,235,0.2);">Почати спілкування</button></div>`;
+    chatBox.innerHTML = `<div style="padding:40px 20px; text-align:center; display:flex; flex-direction:column; gap:12px;"><h3>👋 Вітаємо!</h3><p>Для продовження вкажіть свої дані:</p><input type="text" id="r-name" placeholder="Ваше ім'я (обов'язково)" style="padding:14px; border:1px solid #cbd5e1; border-radius:14px; font-size:14px; outline:none;"><input type="text" id="r-phone" placeholder="Ваш телефон або Telegram (@...)" style="padding:14px; border:1px solid #cbd5e1; border-radius:14px; font-size:14px; outline:none;"><button id="r-submit" style="background:#2563eb; color:white; border:none; padding:14px; border-radius:14px; cursor:pointer; font-weight:bold; margin-top:10px; box-shadow: 0 4px 12px rgba(37,99,235,0.2);">Почати спілкування</button></div>`;
     document.getElementById('r-submit').onclick = async () => {
       const name = document.getElementById('r-name').value.trim(); if (!name) return alert('Будь ласка, вкажіть ім\'я');
       const phone = document.getElementById('r-phone').value.trim();
@@ -216,8 +269,8 @@
   }
 
   aiBtn.onclick = () => {
-    aiChatMode = !aiChatMode; aiBtn.classList.toggle('active', aiChatMode); aiBtn.innerText = aiChatMode ? '🔙 Вимкнути AI' : '🤖 Запитати AI';
-    aiBanner.style.display = aiChatMode ? 'flex' : 'none'; msgInput.placeholder = aiChatMode ? 'Запитайте штучний інтелект...' : 'Напишіть нам...';
+    aiChatMode = !aiChatMode; 
+    updateAIModeUI();
     if (aiChatMode) addBubble("Ви перейшли в режим AI. Запитайте!", "bot", false, true);
   };
 
