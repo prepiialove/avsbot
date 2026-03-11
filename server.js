@@ -427,13 +427,35 @@ app.post('/api/ai_chat', async (req, res) => {
     res.json({ reply: replyTxt });
 });
 
-app.get('/api/admin/debug-ai', (req, res) => {
-    const key = process.env.GEMINI_API_KEY;
+app.get('/api/admin/debug-ai', async (req, res) => {
+    let key = process.env.GEMINI_API_KEY;
+    let originalLength = key ? key.length : 0;
+    if (key && key.length > 39 && key.startsWith('AIzaSy')) {
+        key = key.substring(0, 39);
+    }
+    
+    let apiError = null;
+    let status = null;
+    try {
+        const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${key}`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ contents: [{ parts: [{ text: "test" }] }] })
+        });
+        status = response.status;
+        const data = await response.json();
+        apiError = data.error || null;
+    } catch (e) {
+        apiError = e.message;
+    }
+
     res.json({
         hasKey: !!key,
-        length: key ? key.length : 0,
+        originalLength,
+        trimmedLength: key ? key.length : 0,
         start: key ? key.substring(0, 5) : null,
-        models: ['gemini-2.0-flash', 'gemini-1.5-flash', 'gemini-1.5-pro']
+        apiStatus: status,
+        apiError
     });
 });
 app.get('/api/history', (req, res) => res.json({ messages: sessions.get(req.query.session)?.messages || [] }));
