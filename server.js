@@ -195,7 +195,7 @@ async function getAIResponse(userMessage, customKey = null, customModel = null) 
 // ============================
 //  NOTIFICATIONS
 // ============================
-async function notifyAdmin(session, sessionId, isNew = false, aiReply = null, isCallback = false) {
+async function notifyAdmin(session, sessionId, isNew = false, aiReply = null, isCallback = false, isAiMode = false) {
     if (!adminChatId) return;
     const platform = session.tgChatId ? '📟 TG' : '🌐 Web';
     const adminUrl = `${BASE_URL}/admin.html?session=${sessionId}`;
@@ -222,7 +222,8 @@ async function notifyAdmin(session, sessionId, isNew = false, aiReply = null, is
 
     const lastMsg = session.messages.filter(m => m.from === 'user').slice(-1)[0];
     if (lastMsg) {
-        return safeSend(adminChatId, `💬 *${session.name}* (${platform})\n\n${lastMsg.text}\n\n🔗 [Відкрити в адмінці](${adminUrl})\n_Натисніть "Відповісти" нижче, щоб написати сюди, або кнопку "Відкрити"_`, { reply_markup: { inline_keyboard } });
+        const modeTag = isAiMode ? '🤖 [Режим AI]' : '👨🏻‍💻 [Повідомлення Менеджеру]';
+        return safeSend(adminChatId, `💬 *${session.name}* (${platform})\n${modeTag}\n\n${lastMsg.text}\n\n🔗 [Відкрити в адмінці](${adminUrl})\n_Натисніть "Відповісти" нижче, щоб написати сюди, або кнопку "Відкрити"_`, { reply_markup: { inline_keyboard } });
     }
 }
 
@@ -385,7 +386,7 @@ app.post('/api/send', async (req, res) => {
     const { sessionId, message } = req.body;
     const s = getOrCreateSession(sessionId);
     s.messages.push({ from: 'user', text: message, ts: Date.now() });
-    saveSessions(); await notifyAdmin(s, sessionId);
+    saveSessions(); await notifyAdmin(s, sessionId, false, null, false, false);
     res.json({ ok: true });
 });
 
@@ -397,7 +398,7 @@ app.post('/api/ai_chat', async (req, res) => {
     const s = sessionId !== 'cheat_sheet_user' ? getOrCreateSession(sessionId) : null;
     if (s) {
         s.messages.push({ from: 'user', text: message, ts: Date.now() });
-        await notifyAdmin(s, sessionId);
+        await notifyAdmin(s, sessionId, false, null, false, true);
     }
 
     let replyTxt = await getAIResponse(message, customKey, model);

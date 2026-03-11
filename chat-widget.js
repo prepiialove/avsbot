@@ -169,6 +169,8 @@
 
   function openChat(startInAIMode = false) {
     aiChatMode = startInAIMode;
+    localStorage.setItem('avs_chat_mode', aiChatMode ? 'ai' : 'manager');
+    localStorage.setItem('avs_chat_open', 'true');
     updateAIModeUI();
     
     isChatOpen = true; 
@@ -194,6 +196,7 @@
   
   document.getElementById('avs-close-btn').onclick = () => { 
     isChatOpen = false; 
+    localStorage.setItem('avs_chat_open', 'false');
     container.classList.remove('open'); 
     popup.style.display = 'none'; 
     toggleBtn.style.display = 'flex'; 
@@ -303,5 +306,11 @@
     } catch (e) { }
   }, 2500);
 
-  if (localStorage.getItem('avs_name')) loadHistory();
+  if (localStorage.getItem('avs_name')) {
+    loadHistory();
+    if (localStorage.getItem('avs_chat_open') === 'true') {
+      const mode = localStorage.getItem('avs_chat_mode') === 'ai';
+      setTimeout(() => openChat(mode), 300);
+    }
+  }
 })();
