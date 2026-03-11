@@ -10,7 +10,7 @@ const PORT = process.env.PORT || 3001;
 const TELEGRAM_TOKEN = process.env.TELEGRAM_TOKEN;
 const GEMINI_API_KEY = process.env.GEMINI_API_KEY;
 const BASE_URL = 'https://avsbot.onrender.com';
-const ALLOWED_MODELS = ['gemini-1.5-flash', 'gemini-2.0-flash', 'gemini-1.5-pro'];
+const ALLOWED_MODELS = ['gemini-1.5-flash', 'gemini-1.5-pro', 'gemini-2.0-flash-lite-preview-02-05', 'gemini-2.0-flash-exp'];
 // ============================
 //  PROCESS SAFETY
 // ============================
