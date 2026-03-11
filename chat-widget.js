@@ -23,14 +23,27 @@
     .avs-widget-container.open { width: 360px; height: 620px; }
     .avs-button { width: 60px; height: 60px; border-radius: 50%; background: #2563eb; color: white; border: none; cursor: pointer; display: flex; align-items: center; justify-content: center; position: absolute; bottom: 0; right: 0; box-shadow: 0 10px 25px rgba(37,99,235,0.4); z-index: 10; }
     
-    .avs-call-btn { width: 48px; height: 48px; border-radius: 50%; background: linear-gradient(135deg, #10b981, #059669); color: white; border: none; cursor: pointer; display: flex; align-items: center; justify-content: center; position: fixed; bottom: 85px; right: 26px; box-shadow: 0 8px 20px rgba(16,185,129,0.3); transition: 0.3s; z-index: 2147483646; }
-    .avs-call-btn:hover { transform: scale(1.1); }
-    
-    .avs-tg-btn { width: 48px; height: 48px; border-radius: 50%; background: linear-gradient(135deg, #0088cc, #00a2ed); color: white; border: none; cursor: pointer; display: flex; align-items: center; justify-content: center; position: fixed; bottom: 145px; right: 26px; box-shadow: 0 8px 20px rgba(0,136,204,0.3); transition: 0.3s; z-index: 2147483646; text-decoration: none; }
-    .avs-tg-btn:hover { transform: scale(1.1); }
+    .avs-floating-btn { 
+      position: fixed; right: 26px; 
+      height: 48px; border-radius: 24px; 
+      display: flex; align-items: center; justify-content: flex-end; 
+      padding: 0 14px; color: white; border: none; cursor: pointer; 
+      box-shadow: 0 8px 20px rgba(0,0,0,0.2); 
+      transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); 
+      z-index: 2147483646; text-decoration: none; overflow: hidden;
+      width: 48px;
+    }
+    .avs-floating-btn:hover { width: auto; padding-left: 20px; min-width: 160px; transform: translateX(-5px); }
+    .avs-btn-label { 
+      white-space: nowrap; opacity: 0; transform: translateX(10px); 
+      transition: all 0.3s ease; font-weight: 600; font-size: 13px; 
+      margin-right: 12px; pointer-events: none;
+    }
+    .avs-floating-btn:hover .avs-btn-label { opacity: 1; transform: translateX(0); }
 
-    .avs-cal-btn { width: 48px; height: 48px; border-radius: 50%; background: linear-gradient(135deg, #8b5cf6, #7c3aed); color: white; border: none; cursor: pointer; display: flex; align-items: center; justify-content: center; position: fixed; bottom: 205px; right: 26px; box-shadow: 0 8px 20px rgba(139, 92, 246, 0.3); transition: 0.3s; z-index: 2147483646; text-decoration: none; }
-    .avs-cal-btn:hover { transform: scale(1.1); }
+    .avs-cal-btn { background: linear-gradient(135deg, #8b5cf6, #7c3aed); bottom: 205px; box-shadow: 0 8px 20px rgba(139, 92, 246, 0.3); }
+    .avs-tg-btn { background: linear-gradient(135deg, #0088cc, #00a2ed); bottom: 145px; box-shadow: 0 8px 20px rgba(0,136,204,0.3); }
+    .avs-call-btn { background: linear-gradient(135deg, #10b981, #059669); bottom: 85px; box-shadow: 0 8px 20px rgba(16,185,129,0.3); }
 
     .avs-popup { position: absolute; bottom: 0; right: 0; width: 100%; height: 100%; background: #fff; border-radius: 28px; border: 1px solid #e2e8f0; box-shadow: 0 30px 60px rgba(0,0,0,0.15); display: none; flex-direction: column; overflow: hidden; }
     .avs-header { background: #2563eb; color: white; padding: 18px 20px; display: flex; align-items: center; justify-content: space-between; }
@@ -59,9 +72,9 @@
   const container = document.createElement('div');
   container.className = 'avs-widget-container';
   container.innerHTML = `
-    <a href="${CALENDLY_LINK}" target="_blank" class="avs-cal-btn" id="avs-fast-cal-btn" title="Забронювати інтерв'ю"><i class="fa-solid fa-calendar-days" style="font-size: 20px;"></i></a>
-    <a href="${TG_LINK}" target="_blank" class="avs-tg-btn" id="avs-fast-tg-btn" title="Telegram Bot"><i class="fa-brands fa-telegram" style="font-size: 24px;"></i></a>
-    <button class="avs-call-btn" id="avs-fast-call-btn" title="Замовити дзвінок"><i class="fa-solid fa-phone" style="font-size: 18px;"></i></button>
+    <a href="${CALENDLY_LINK}" target="_blank" class="avs-floating-btn avs-cal-btn" id="avs-fast-cal-btn"><span class="avs-btn-label">Зарезервувати місце</span><i class="fa-solid fa-calendar-days" style="font-size: 20px;"></i></a>
+    <a href="${TG_LINK}" target="_blank" class="avs-floating-btn avs-tg-btn" id="avs-fast-tg-btn"><span class="avs-btn-label">Telegram Бот</span><i class="fa-brands fa-telegram" style="font-size: 24px;"></i></a>
+    <button class="avs-floating-btn avs-call-btn" id="avs-fast-call-btn"><span class="avs-btn-label">Замовити дзвінок</span><i class="fa-solid fa-phone" style="font-size: 18px;"></i></button>
     <button class="avs-button" id="avs-toggle-btn"><i class="fa-solid fa-comments" style="font-size: 24px;"></i></button>
     <div class="avs-popup" id="avs-popup-win">
       <div class="avs-header">
