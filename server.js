@@ -8,8 +8,7 @@ const path = require('path');
 const app = express();
 const PORT = process.env.PORT || 3001;
 const TELEGRAM_TOKEN = process.env.TELEGRAM_TOKEN;
-// Force overriding any old leaked key stuck in Render's environment variables
-const GEMINI_API_KEY = process.env.GEMINI_API_KEY && !process.env.GEMINI_API_KEY.includes('DQdk') && !process.env.GEMINI_API_KEY.includes('DY_') ? process.env.GEMINI_API_KEY : 'AIzaSyDLKBbSQnK3kQX7YOsgYJnUZSKd358zNu4';
+const GEMINI_API_KEY = process.env.GEMINI_API_KEY;
 const BASE_URL = 'https://avsbot.onrender.com';
 
 // ============================
