@@ -427,6 +427,15 @@ app.post('/api/ai_chat', async (req, res) => {
     res.json({ reply: replyTxt });
 });
 
+app.get('/api/admin/debug-ai', (req, res) => {
+    const key = process.env.GEMINI_API_KEY;
+    res.json({
+        hasKey: !!key,
+        length: key ? key.length : 0,
+        start: key ? key.substring(0, 5) : null,
+        models: ['gemini-2.0-flash', 'gemini-1.5-flash', 'gemini-1.5-pro']
+    });
+});
 app.get('/api/history', (req, res) => res.json({ messages: sessions.get(req.query.session)?.messages || [] }));
 app.get('/api/poll', (req, res) => {
     const s = sessions.get(req.query.session);
