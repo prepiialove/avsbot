@@ -443,22 +443,35 @@ app.get('/api/admin/debug-ai', async (req, res) => {
     if (!key) return res.json({ ...info, error: "GEMINI_API_KEY is missing in process.env" });
 
     const results = [];
-    for (const mId of ALLOWED_MODELS) {
-        try {
-            const resp = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${mId}:generateContent?key=${key}`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ contents: [{ parts: [{ text: "ping" }] }] })
-            });
-            const data = await resp.json();
-            results.push({ model: mId, status: resp.status, ok: !data.error, error: data.error?.message });
-        } catch (e) {
-            results.push({ model: mId, ok: false, error: e.message });
+    const apiVersions = ['v1', 'v1beta'];
+    
+    // 1. Try to list models to see what is available
+    let availableModels = [];
+    try {
+        const listResp = await fetch(`https://generativelanguage.googleapis.com/v1beta/models?key=${key}`);
+        const listData = await listResp.json();
+        availableModels = listData.models ? listData.models.map(m => m.name.replace('models/', '')) : [];
+    } catch (e) {}
+
+    for (const v of apiVersions) {
+        for (const mId of ALLOWED_MODELS) {
+            try {
+                const resp = await fetch(`https://generativelanguage.googleapis.com/${v}/models/${mId}:generateContent?key=${key}`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ contents: [{ parts: [{ text: "hi" }] }] })
+                });
+                const data = await resp.json();
+                results.push({ version: v, model: mId, status: resp.status, ok: !data.error, error: data.error?.message });
+            } catch (e) {
+                results.push({ version: v, model: mId, ok: false, error: e.message });
+            }
         }
     }
 
     res.json({
         ...info,
+        availableOnCloud: availableModels,
         overallStatus: results.some(r => r.ok) ? "OK" : "NO_WORKING_MODELS",
         checks: results
     });
