@@ -403,19 +403,22 @@ app.post('/api/send', async (req, res) => {
 app.post('/api/ai_chat', async (req, res) => {
     const { sessionId, message, customKey, model } = req.body;
 
-    // For the public "cheat sheet" assistant, we don't necessarily need sessions,
-    // but we'll try to use it if provided.
     const s = sessionId !== 'cheat_sheet_user' ? getOrCreateSession(sessionId) : null;
     if (s) {
         s.messages.push({ from: 'user', text: message, ts: Date.now() });
         await notifyAdmin(s, sessionId, false, null, false, true);
     }
 
+    // Check if AI is globally enabled or if a custom key is provided (which overrides for testing)
+    if (!aiEnabled && !customKey) {
+        return res.json({ reply: "Режим AI зараз вимкнено менеджером. Перейдіть у режим Менеджера для спілкування." });
+    }
+
     let replyTxt;
-if (model && !ALLOWED_MODELS.includes(model)) {
-  return res.json({ error: `Model ${model} is not supported. Use one of: ${ALLOWED_MODELS.join(', ')}` });
-}
-replyTxt = await getAIResponse(message, customKey, model);
+    if (model && !ALLOWED_MODELS.includes(model)) {
+        return res.json({ error: `Model ${model} is not supported. Use one of: ${ALLOWED_MODELS.join(', ')}` });
+    }
+    replyTxt = await getAIResponse(message, customKey, model);
 
     if (!replyTxt) {
         return res.json({ reply: "Вибачте, сталася помилка при генерації відповіді. Спробуйте пізніше." });
