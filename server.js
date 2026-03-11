@@ -177,7 +177,7 @@ async function getAIResponse(userMessage, customKey = null, customModel = null) 
 4. Якщо питають те, чого ти не знаєш (або не стосується AVS) - кажи: "Це питання найкраще обговорити з народи менеджером. Напишіть йому, перемкнувши режим чату."
 5. Коли вітаєшся, кажи: "Вітаю! Я AI помічник AVS EdTech. Чим можу допомогти з вакансією PM?"`;
 
-    const MODELS = customModel ? [customModel] : ['gemini-2.5-flash', 'gemini-2.5-pro', 'gemini-2.0-flash', 'gemini-1.5-flash'];
+    const MODELS = customModel ? [customModel] : ['gemini-2.0-flash', 'gemini-1.5-flash', 'gemini-1.5-pro'];
 
     for (const modelId of MODELS) {
         try {
@@ -191,9 +191,10 @@ async function getAIResponse(userMessage, customKey = null, customModel = null) 
                     generationConfig: { temperature: 0.7 }
                 })
             });
+            console.log(`[AI] ${modelId} status: ${response.status}`);
             const data = await response.json();
             if (data.error) {
-                console.error(`[AI] Error ${modelId}:`, data.error.message);
+                console.error(`[AI] Error ${modelId}:`, JSON.stringify(data.error));
                 continue;
             }
             let text = data.candidates?.[0]?.content?.parts?.[0]?.text;
