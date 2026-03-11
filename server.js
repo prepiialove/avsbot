@@ -28,7 +28,7 @@ let adminChatId = 404389668;
 const SESSIONS_FILE = path.join(__dirname, 'sessions.json');
 
 let sessions = new Map();
-let aiEnabled = false;
+let aiEnabled = true;
 let adminReplyTarget = new Map();
 
 function loadSessions() {
